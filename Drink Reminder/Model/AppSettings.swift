@@ -17,6 +17,7 @@ struct AppSettings: Codable, Equatable {
     var runAtLogin: Bool
     var dailyGoalLiters: Double
     var drinkPortionMilliliters: Int
+    var language: AppLanguage
 
     static let `default` = AppSettings(
         reminderIntervalMinutes: 60,
@@ -27,7 +28,8 @@ struct AppSettings: Codable, Equatable {
         enableNotification: true,
         runAtLogin: false,
         dailyGoalLiters: 2.0,
-        drinkPortionMilliliters: 250
+        drinkPortionMilliliters: 250,
+        language: .english
     )
 
     enum CodingKeys: String, CodingKey {
@@ -40,6 +42,7 @@ struct AppSettings: Codable, Equatable {
         case runAtLogin
         case dailyGoalLiters
         case drinkPortionMilliliters
+        case language
     }
 
     init(from decoder: Decoder) throws {
@@ -53,10 +56,11 @@ struct AppSettings: Codable, Equatable {
         runAtLogin = try container.decodeIfPresent(Bool.self, forKey: .runAtLogin) ?? AppSettings.default.runAtLogin
         dailyGoalLiters = try container.decodeIfPresent(Double.self, forKey: .dailyGoalLiters) ?? AppSettings.default.dailyGoalLiters
         drinkPortionMilliliters = try container.decodeIfPresent(Int.self, forKey: .drinkPortionMilliliters) ?? AppSettings.default.drinkPortionMilliliters
+        language = try container.decodeIfPresent(AppLanguage.self, forKey: .language) ?? .english
     }
     
     // Add a custom initializer to be used by the default static property and tests
-    init(reminderIntervalMinutes: Int, startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, enableNotification: Bool, runAtLogin: Bool = false, dailyGoalLiters: Double = 2.0, drinkPortionMilliliters: Int = 250) {
+    init(reminderIntervalMinutes: Int, startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, enableNotification: Bool, runAtLogin: Bool = false, dailyGoalLiters: Double = 2.0, drinkPortionMilliliters: Int = 250, language: AppLanguage = .english) {
         self.reminderIntervalMinutes = reminderIntervalMinutes
         self.startHour = startHour
         self.startMinute = startMinute
@@ -66,5 +70,6 @@ struct AppSettings: Codable, Equatable {
         self.runAtLogin = runAtLogin
         self.dailyGoalLiters = dailyGoalLiters
         self.drinkPortionMilliliters = drinkPortionMilliliters
+        self.language = language
     }
 }

@@ -26,10 +26,10 @@ struct NotificationManager {
         return await authorizationStatus()
     }
 
-    func sendReminder() async {
+    func sendReminder(language: AppLanguage = .english) async {
         let content = UNMutableNotificationContent()
-        content.title = "It's time to drink"
-        content.body = "water or whatever"
+        content.title = "It's time to drink".localized(language)
+        content.body = "water or whatever".localized(language)
         content.sound = .default
 
         let request = UNNotificationRequest(

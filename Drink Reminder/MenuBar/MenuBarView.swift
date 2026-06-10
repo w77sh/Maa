@@ -44,7 +44,7 @@ struct MenuBarView: View {
                 Button(action: {
                     reminderManager.drinkNow()
                 }) {
-                    Label("Drink now", systemImage: "plus.circle.fill")
+                    Label("Drink now".localized(reminderManager.settings.language), systemImage: "plus.circle.fill")
                 }
                 .buttonStyle(.plain)
                 .disabled(reminderManager.state.isPausedToday)
@@ -52,13 +52,13 @@ struct MenuBarView: View {
                 Button(action: {
                     reminderManager.snooze30Minutes()
                 }) {
-                    Label("Snooze 30 minutes", systemImage: "powersleep")
+                    Label("Snooze 30 minutes".localized(reminderManager.settings.language), systemImage: "powersleep")
                 }
                 .buttonStyle(.plain)
                 .disabled(reminderManager.state.isPausedToday)
 
                 Button(action: reminderAction) {
-                    Label(reminderActionTitle, systemImage: reminderManager.state.isPausedToday ? "play.circle.fill" : "pause.circle.fill")
+                    Label(reminderActionTitle.localized(reminderManager.settings.language), systemImage: reminderManager.state.isPausedToday ? "play.circle.fill" : "pause.circle.fill")
                 }
                 .buttonStyle(.plain)
             }
@@ -70,7 +70,7 @@ struct MenuBarView: View {
                 openSettings()
                 NSApplication.shared.activate(ignoringOtherApps: true)
             }) {
-                Label("Settings", systemImage: "gearshape.fill")
+                Label("Settings".localized(reminderManager.settings.language), systemImage: "gearshape.fill")
             }
             .buttonStyle(.plain)
 
@@ -79,7 +79,7 @@ struct MenuBarView: View {
             Button(action: {
                 NSApplication.shared.terminate(nil)
             }) {
-                Label("Quit", systemImage: "power.circle.fill")
+                Label("Quit".localized(reminderManager.settings.language), systemImage: "power.circle.fill")
             }
             .buttonStyle(.plain)
         }
@@ -87,40 +87,49 @@ struct MenuBarView: View {
     }
 
     private var primaryStatusLine: String {
+        let lang = reminderManager.settings.language
         if reminderManager.state.isPausedToday {
-            return "Paused today"
+            return "Paused today".localized(lang)
         }
 
         if reminderManager.isOutsideReminderWindow {
-            return "Outside reminder window"
+            return "Outside reminder window".localized(lang)
         }
 
         if let nextReminderTime = reminderManager.state.nextReminderTime {
-            return "Next reminder: \(TimeUtils.menuDateTimeString(nextReminderTime))"
+            return String(format: "Next reminder: %@".localized(lang), TimeUtils.menuDateTimeString(nextReminderTime, language: lang))
         }
 
-        return "Next reminder unavailable"
+        return "Next reminder unavailable".localized(lang)
     }
 
     private var secondaryStatusLine: String? {
+        let lang = reminderManager.settings.language
         guard !reminderManager.state.isPausedToday else {
-            return reminderManager.nextReminderDescription
+            if let nextReminderTime = reminderManager.state.nextReminderTime {
+                return String(format: "Next reminder: %@".localized(lang), TimeUtils.menuDateTimeString(nextReminderTime, language: lang))
+            }
+            return nil
         }
 
         guard reminderManager.isOutsideReminderWindow else {
             return nil
         }
 
-        return reminderManager.nextReminderDescription
+        if let nextReminderTime = reminderManager.state.nextReminderTime {
+            return String(format: "Next reminder: %@".localized(lang), TimeUtils.menuDateTimeString(nextReminderTime, language: lang))
+        }
+        return nil
     }
 
     private var notificationStatusLine: String? {
+        let lang = reminderManager.settings.language
         if !reminderManager.settings.enableNotification {
-            return "Notifications disabled"
+            return "Notifications disabled".localized(lang)
         }
 
         if reminderManager.notificationAuthorizationStatus == .denied {
-            return "Enable notifications in System Settings"
+            return "Enable notifications in System Settings".localized(lang)
         }
 
         return nil

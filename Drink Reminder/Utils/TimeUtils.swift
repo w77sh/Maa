@@ -37,15 +37,19 @@ enum TimeUtils {
         calendar.startOfDay(for: date)
     }
 
-    nonisolated static func menuDateTimeString(_ date: Date, calendar: Calendar = .current) -> String {
+    nonisolated static func menuDateTimeString(_ date: Date, calendar: Calendar = .current, language: AppLanguage = .english) -> String {
+        let locale = Locale(identifier: language.rawValue)
+        let formattedTime = date.formatted(.dateTime.hour().minute().locale(locale))
+        
         if calendar.isDateInToday(date) {
-            return date.formatted(.dateTime.hour().minute())
+            return formattedTime
         }
 
         if calendar.isDateInTomorrow(date) {
-            return "Tomorrow \(date.formatted(.dateTime.hour().minute()))"
+            let tomorrow = language == .arabic ? "غداً" : "Tomorrow"
+            return "\(tomorrow) \(formattedTime)"
         }
 
-        return date.formatted(.dateTime.month().day().hour().minute())
+        return date.formatted(.dateTime.month().day().hour().minute().locale(locale))
     }
 }

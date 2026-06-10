@@ -27,15 +27,19 @@ struct Drink_ReminderApp: App {
         MenuBarExtra {
             MenuBarView()
                 .environment(reminderManager)
+                .environment(\.locale, Locale(identifier: reminderManager.settings.language.rawValue))
+                .environment(\.layoutDirection, reminderManager.settings.language == .arabic ? .rightToLeft : .leftToRight)
         } label: {
             menuBarIcon
-                .accessibilityLabel("Drink Reminder")
+                .accessibilityLabel("Drink Reminder".localized(reminderManager.settings.language))
         }
         .menuBarExtraStyle(.menu)
 
         Settings {
             SettingsView()
                 .environment(reminderManager)
+                .environment(\.locale, Locale(identifier: reminderManager.settings.language.rawValue))
+                .environment(\.layoutDirection, reminderManager.settings.language == .arabic ? .rightToLeft : .leftToRight)
                 .frame(minWidth: 380, minHeight: 320)
         }
     }

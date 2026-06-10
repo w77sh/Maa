@@ -20,49 +20,51 @@ struct SettingsView: View {
     @State private var runAtLogin = false
     @State private var dailyGoalLiters: Double = 2.0
     @State private var drinkPortionMilliliters: Int = 250
+    @State private var language: AppLanguage = .english
     @State private var validationMessage: String?
 
     private let calendar = Calendar.current
 
     var body: some View {
+        let lang = reminderManager.settings.language
         Form {
-            Section("General") {
-                Toggle("Run automatically at login", isOn: $runAtLogin)
+            Section("General".localized(lang)) {
+                Toggle("Run automatically at login".localized(lang), isOn: $runAtLogin)
             }
             
-            Section("Goal") {
+            Section("Goal".localized(lang)) {
                 Stepper(value: $dailyGoalLiters, in: 0.5...10, step: 0.1) {
-                    Text("Daily Goal: \(dailyGoalLiters, specifier: "%.1f") liters")
+                    Text(String(format: "Daily Goal: %.1f liters".localized(lang), dailyGoalLiters))
                 }
                 
                 Stepper(value: $drinkPortionMilliliters, in: 50...1000, step: 50) {
-                    Text("Drink Portion: \(drinkPortionMilliliters) ml")
+                    Text(String(format: "Drink Portion: %d ml".localized(lang), drinkPortionMilliliters))
                 }
             }
 
-            Section("Interval") {
-                Picker("Reminder Interval", selection: $intervalChoice) {
+            Section("Interval".localized(lang)) {
+                Picker("Reminder Interval".localized(lang), selection: $intervalChoice) {
                     ForEach(IntervalChoice.allCases) { choice in
-                        Text(choice.title).tag(choice)
+                        Text(choice.title(for: lang)).tag(choice)
                     }
                 }
 
                 if intervalChoice == .custom {
-                    TextField("Custom interval (minutes)", text: $customIntervalText)
+                    TextField("Custom interval (minutes)".localized(lang), text: $customIntervalText)
                         .textFieldStyle(.roundedBorder)
                 }
             }
 
-            Section("Reminder Time Range") {
-                DatePicker("Start Time", selection: $startTime, displayedComponents: .hourAndMinute)
-                DatePicker("End Time", selection: $endTime, displayedComponents: .hourAndMinute)
+            Section("Reminder Time Range".localized(lang)) {
+                DatePicker("Start Time".localized(lang), selection: $startTime, displayedComponents: .hourAndMinute)
+                DatePicker("End Time".localized(lang), selection: $endTime, displayedComponents: .hourAndMinute)
             }
 
-            Section("Reminder Mode") {
-                Toggle("System Notification", isOn: $enableNotification)
+            Section("Reminder Mode".localized(lang)) {
+                Toggle("System Notification".localized(lang), isOn: $enableNotification)
 
                 if enableNotification && reminderManager.notificationAuthorizationStatus == .denied {
-                    Button("Enable notifications in System Settings") {
+                    Button("Enable notifications in System Settings".localized(lang)) {
                         reminderManager.openSystemNotificationSettings()
                     }
                     .buttonStyle(.plain)
@@ -71,9 +73,17 @@ struct SettingsView: View {
                 }
             }
 
+            Section("Language".localized(lang)) {
+                Picker("Language".localized(lang), selection: $language) {
+                    ForEach(AppLanguage.allCases) { choice in
+                        Text(choice.title).tag(choice)
+                    }
+                }
+            }
+
             if let validationMessage {
                 Section {
-                    Text(validationMessage)
+                    Text(validationMessage.localized(lang))
                         .foregroundStyle(.red)
                 }
             }
@@ -98,6 +108,7 @@ struct SettingsView: View {
         }
         .onChange(of: dailyGoalLiters) { _, _ in updateSettings() }
         .onChange(of: drinkPortionMilliliters) { _, _ in updateSettings() }
+        .onChange(of: language) { _, _ in updateSettings() }
     }
 
     private func updateSettings() {
@@ -110,20 +121,26 @@ struct SettingsView: View {
         let endComponents = calendar.dateComponents([.hour, .minute], from: endTime)
 
         let updatedSettings = AppSettings(
-            reminderIntervalMinutes: runAtLogin,
-            startHour: dailyGoalLiters,
-            startMinute: drinkPortionMilliliters,
-            endHour: intervalMinutes,
-            endMinute: startComponents.hour ?? 9,
-            enableNotification: startComponents.minute ?? 0,
-            runAtLogin: endComponents.hour ?? 20,
-            dailyGoalLiters: endComponents.minute ?? 0,
-            drinkPortionMilliliters: enableNotification
+            reminderIntervalMinutes: intervalMinutes,
+            startHour: startComponents.hour ?? 9,
+            startMinute: startComponents.minute ?? 0,
+            endHour: endComponents.hour ?? 20,
+            endMinute: endComponents.minute ?? 0,
+            enableNotification: enableNotification,
+            runAtLogin: runAtLogin,
+            dailyGoalLiters: dailyGoalLiters,
+            drinkPortionMilliliters: drinkPortionMilliliters,
+            language: language
         )
 
         if updatedSettings != reminderManager.settings {
-            reminderManager.update(settings: updatedSettings)
-            validationMessage = nil
+            let result = reminderManager.updateSettings(updatedSettings)
+            switch result {
+            case .valid:
+                validationMessage = nil
+            case .invalid(let error):
+                validationMessage = error.errorDescription
+            }
         }
     }
 
@@ -145,6 +162,7 @@ struct SettingsView: View {
         runAtLogin = settings.runAtLogin
         dailyGoalLiters = settings.dailyGoalLiters
         drinkPortionMilliliters = settings.drinkPortionMilliliters
+        language = settings.language
     }
 
     private var resolvedIntervalMinutes: Int? {
@@ -177,6 +195,49 @@ struct SettingsView: View {
             print("Failed to \(enabled ? "register" : "unregister") login item: \(error.localizedDescription)")
             // Optionally, show an alert to the user
         }
+    }
+}
+
+enum IntervalChoice: Int, CaseIterable, Identifiable {
+    case minutes5 = 5
+    case minutes10 = 10
+    case minutes15 = 15
+    case minutes30 = 30
+    case minutes45 = 45
+    case minutes60 = 60
+    case custom = 0
+
+    var id: Self { self }
+
+    var title: String {
+        switch self {
+        case .minutes5: return "5 minutes"
+        case .minutes10: return "10 minutes"
+        case .minutes15: return "15 minutes"
+        case .minutes30: return "30 minutes"
+        case .minutes45: return "45 minutes"
+        case .minutes60: return "1 hour"
+        case .custom: return "Custom..."
+        }
+    }
+
+    func title(for language: AppLanguage) -> String {
+        switch self {
+        case .minutes5: return language == .arabic ? "٥ دقائق" : "5 minutes"
+        case .minutes10: return language == .arabic ? "١٠ دقائق" : "10 minutes"
+        case .minutes15: return language == .arabic ? "١٥ دقيقة" : "15 minutes"
+        case .minutes30: return language == .arabic ? "٣٠ دقيقة" : "30 minutes"
+        case .minutes45: return language == .arabic ? "٤٥ دقيقة" : "45 minutes"
+        case .minutes60: return language == .arabic ? "ساعة واحدة" : "1 hour"
+        case .custom: return language == .arabic ? "مخصص..." : "Custom..."
+        }
+    }
+
+    static func from(minutes: Int) -> IntervalChoice? {
+        if let choice = IntervalChoice(rawValue: minutes) {
+            return choice
+        }
+        return nil
     }
 }
 

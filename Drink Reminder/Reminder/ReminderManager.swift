@@ -157,6 +157,14 @@ final class ReminderManager {
         pauseOrResume(now: Date())
     }
 
+    func pauseOrResume(now: Date) {
+        if state.isPausedToday {
+            resumeReminders(now: now)
+        } else {
+            pauseToday(now: now)
+        }
+    }
+
     var isOutsideReminderWindow: Bool {
         !state.isPausedToday && !ReminderScheduler.isWithinReminderWindow(now: Date(), settings: settings, calendar: calendar)
     }
@@ -209,7 +217,7 @@ final class ReminderManager {
                 return
             }
 
-            await notificationManager.sendReminder()
+            await notificationManager.sendReminder(language: settings.language)
         }
     }
 
