@@ -18,6 +18,8 @@ final class ReminderManager {
     private(set) var notificationAuthorizationStatus: UNAuthorizationStatus = .notDetermined
 
     private let settingsStore: SettingsStore
+    private let stateStore: ReminderStateStore
+    private let historyStore: DailyHistoryStore
     private let notificationManager: NotificationManager
     private var timer: Timer?
     private var wakeObserver: NSObjectProtocol?
@@ -26,13 +28,19 @@ final class ReminderManager {
 
     init(
         settingsStore: SettingsStore? = nil,
+        stateStore: ReminderStateStore? = nil,
+        historyStore: DailyHistoryStore? = nil,
         notificationManager: NotificationManager? = nil,
         calendar: Calendar = .current
     ) {
         let resolvedSettingsStore = settingsStore ?? SettingsStore()
+        let resolvedStateStore = stateStore ?? ReminderStateStore()
+        let resolvedHistoryStore = historyStore ?? DailyHistoryStore()
         let resolvedNotificationManager = notificationManager ?? NotificationManager()
 
         self.settingsStore = resolvedSettingsStore
+        self.stateStore = resolvedStateStore
+        self.historyStore = resolvedHistoryStore
         self.notificationManager = resolvedNotificationManager
         self.calendar = calendar
 
@@ -45,7 +53,12 @@ final class ReminderManager {
             resolvedSettingsStore.save(.default)
         }
 
-        state = ReminderState(lastProcessedDay: TimeUtils.startOfDay(for: Date(), calendar: calendar))
+        if let savedState = resolvedStateStore.load() {
+            state = savedState
+        } else {
+            state = ReminderState(lastProcessedDay: TimeUtils.startOfDay(for: Date(), calendar: calendar))
+        }
+        
         start()
     }
 
@@ -91,6 +104,8 @@ final class ReminderManager {
         state.snoozedUntil = nil
         state.isPausedToday = false
         state.nextReminderTime = nil
+        state.consumedMilliliters += settings.drinkPortionMilliliters
+        saveStateAndHistory(now: now)
         recalculateNextReminder(now: now)
     }
 
@@ -100,6 +115,7 @@ final class ReminderManager {
 
     func snooze30Minutes(now: Date) {
         state.snoozedUntil = now.addingTimeInterval(30 * 60)
+        stateStore.save(state)
         recalculateNextReminder(now: now)
     }
 
@@ -112,6 +128,7 @@ final class ReminderManager {
         state.isPausedToday = true
         state.nextReminderTime = nil
         state.snoozedUntil = nil
+        stateStore.save(state)
     }
 
     func resumeReminders() {
@@ -123,6 +140,7 @@ final class ReminderManager {
         state.isPausedToday = false
         state.nextReminderTime = nil
         state.snoozedUntil = nil
+        stateStore.save(state)
         recalculateNextReminder(now: now)
     }
 
@@ -136,6 +154,7 @@ final class ReminderManager {
         settingsStore.save(newSettings)
         state.nextReminderTime = nil
         state.snoozedUntil = nil
+        stateStore.save(state)
         recalculateNextReminder(now: Date(), clearExistingSchedule: true)
 
         Task {
@@ -203,6 +222,11 @@ final class ReminderManager {
             settings: settings,
             calendar: calendar
         )
+        stateStore.save(state)
+
+        if settings.enablePopupWindow {
+            WindowManager.shared.showPopup(reminderManager: self)
+        }
 
         guard settings.enableNotification else {
             return
@@ -234,6 +258,12 @@ final class ReminderManager {
             settings: settings,
             calendar: calendar
         )
+        stateStore.save(state)
+    }
+
+    private func saveStateAndHistory(now: Date) {
+        stateStore.save(state)
+        historyStore.addOrUpdateRecord(for: now, consumedMilliliters: state.consumedMilliliters, calendar: calendar)
     }
 
     private func resetDailyStateIfNeeded(now: Date) {
@@ -253,6 +283,8 @@ final class ReminderManager {
         state.isPausedToday = false
         state.snoozedUntil = nil
         state.lastProcessedDay = currentDay
+        state.consumedMilliliters = 0
+        stateStore.save(state)
     }
 
     private func startTimer() {

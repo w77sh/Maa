@@ -17,6 +17,7 @@ struct SettingsView: View {
     @State private var startTime = Date()
     @State private var endTime = Date()
     @State private var enableNotification = true
+    @State private var enablePopupWindow = true
     @State private var runAtLogin = false
     @State private var dailyGoalLiters: Double = 2.0
     @State private var drinkPortionMilliliters: Int = 250
@@ -62,6 +63,7 @@ struct SettingsView: View {
 
             Section("Reminder Mode".localized(lang)) {
                 Toggle("System Notification".localized(lang), isOn: $enableNotification)
+                Toggle("Popup Window".localized(lang), isOn: $enablePopupWindow)
 
                 if enableNotification && reminderManager.notificationAuthorizationStatus == .denied {
                     Button("Enable notifications in System Settings".localized(lang)) {
@@ -102,6 +104,7 @@ struct SettingsView: View {
         .onChange(of: startTime) { _, _ in updateSettings() }
         .onChange(of: endTime) { _, _ in updateSettings() }
         .onChange(of: enableNotification) { _, _ in updateSettings() }
+        .onChange(of: enablePopupWindow) { _, _ in updateSettings() }
         .onChange(of: runAtLogin) { _, newValue in
             updateSettings()
             updateLoginItem(enabled: newValue)
@@ -130,7 +133,8 @@ struct SettingsView: View {
             runAtLogin: runAtLogin,
             dailyGoalLiters: dailyGoalLiters,
             drinkPortionMilliliters: drinkPortionMilliliters,
-            language: language
+            language: language,
+            enablePopupWindow: enablePopupWindow
         )
 
         if updatedSettings != reminderManager.settings {
@@ -159,6 +163,7 @@ struct SettingsView: View {
         startTime = calendar.date(bySettingHour: settings.startHour, minute: settings.startMinute, second: 0, of: now) ?? now
         endTime = calendar.date(bySettingHour: settings.endHour, minute: settings.endMinute, second: 0, of: now) ?? now
         enableNotification = settings.enableNotification
+        enablePopupWindow = settings.enablePopupWindow
         runAtLogin = settings.runAtLogin
         dailyGoalLiters = settings.dailyGoalLiters
         drinkPortionMilliliters = settings.drinkPortionMilliliters

@@ -47,7 +47,24 @@ enum Localizer {
         "Drink Portion: %d ml": "كمية الشرب: %d مل",
         "Drink Reminder": "مذكّر الشرب",
         "Interval must be at least 5 minutes.": "يجب أن تكون الفترة ٥ دقائق على الأقل.",
-        "End time must be later than start time.": "يجب أن يكون وقت الانتهاء بعد وقت البدء."
+        "End time must be later than start time.": "يجب أن يكون وقت الانتهاء بعد وقت البدء.",
+        "Popup Window": "نافذة منبثقة",
+        "Consumed: %d ml / %d ml": "الكمية المستهلكة: %d مل / %d مل",
+        "It's time to drink water!": "حان وقت شرب الماء!",
+        "Close": "إغلاق",
+        "Snooze": "غفوة",
+        "Drink Now": "اشرب الآن",
+        "Statistics": "الإحصائيات",
+        "Drinking Statistics": "إحصائيات الشرب",
+        "No data available yet.": "لا توجد بيانات متاحة بعد.",
+        "Average Daily Intake": "متوسط الشرب اليومي",
+        "Total Consumed": "إجمالي ما تم شربه",
+        "Best Day": "أفضل يوم",
+        "All Time": "كل الوقت",
+        "Last 7 Days": "آخر ٧ أيام",
+        "Last 30 Days": "آخر ٣٠ يوماً",
+        "Time Range": "النطاق الزمني",
+        "Goal Reached": "تم الوصول للهدف"
     ]
 
     static func string(_ key: String, lang: AppLanguage) -> String {

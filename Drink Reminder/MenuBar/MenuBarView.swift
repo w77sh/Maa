@@ -65,6 +65,15 @@ struct MenuBarView: View {
 
             Divider()
 
+            Button(action: {
+                WindowManager.shared.showStatistics(reminderManager: reminderManager)
+            }) {
+                Label("Statistics".localized(reminderManager.settings.language), systemImage: "chart.bar.fill")
+            }
+            .buttonStyle(.plain)
+
+            Divider()
+
             // App Management Section
             Button(action: {
                 openSettings()
@@ -88,6 +97,11 @@ struct MenuBarView: View {
 
     private var primaryStatusLine: String {
         let lang = reminderManager.settings.language
+        return String(format: "Consumed: %d ml / %d ml".localized(lang), reminderManager.state.consumedMilliliters, Int(reminderManager.settings.dailyGoalLiters * 1000))
+    }
+
+    private var secondaryStatusLine: String? {
+        let lang = reminderManager.settings.language
         if reminderManager.state.isPausedToday {
             return "Paused today".localized(lang)
         }
@@ -101,25 +115,6 @@ struct MenuBarView: View {
         }
 
         return "Next reminder unavailable".localized(lang)
-    }
-
-    private var secondaryStatusLine: String? {
-        let lang = reminderManager.settings.language
-        guard !reminderManager.state.isPausedToday else {
-            if let nextReminderTime = reminderManager.state.nextReminderTime {
-                return String(format: "Next reminder: %@".localized(lang), TimeUtils.menuDateTimeString(nextReminderTime, language: lang))
-            }
-            return nil
-        }
-
-        guard reminderManager.isOutsideReminderWindow else {
-            return nil
-        }
-
-        if let nextReminderTime = reminderManager.state.nextReminderTime {
-            return String(format: "Next reminder: %@".localized(lang), TimeUtils.menuDateTimeString(nextReminderTime, language: lang))
-        }
-        return nil
     }
 
     private var notificationStatusLine: String? {

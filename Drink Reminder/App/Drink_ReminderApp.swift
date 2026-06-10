@@ -3,6 +3,9 @@ import SwiftUI
 
 @main
 struct Drink_ReminderApp: App {
+    @NSApplicationDelegateAdaptor(AppDelegate.self) var appDelegate
+
+
     private static let menuBarIconAssetName = "StatusBarIcon"
     private static let menuBarPausedIconAssetName = "StatusBarIconPaused"
     private static let menuBarFallbackSymbolName = "waterbottle.fill"
@@ -71,5 +74,11 @@ struct Drink_ReminderApp: App {
         reminderManager.shouldUsePausedMenuBarIcon
             ? Self.menuBarPausedFallbackSymbolName
             : Self.menuBarFallbackSymbolName
+    }
+}
+
+class AppDelegate: NSObject, NSApplicationDelegate {
+    func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
+        return false
     }
 }
