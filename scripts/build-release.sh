@@ -61,11 +61,25 @@ echo "Packaging ${artifact_name_zip}..." >&2
 ditto -c -k --sequesterRsrc --keepParent "${app_path}" "${artifact_path_zip}"
 
 echo "Packaging ${artifact_name_dmg}..." >&2
-dmg_dir="${dist_dir}/dmg_tmp"
-mkdir -p "${dmg_dir}"
-cp -R "${app_path}" "${dmg_dir}/"
-ln -s /Applications "${dmg_dir}/Applications"
+if command -v create-dmg >/dev/null 2>&1; then
+  create-dmg \
+    --volname "Maa" \
+    --background "${project_dir}/scripts/dmg-background.png" \
+    --window-pos 200 120 \
+    --window-size 600 400 \
+    --icon-size 100 \
+    --icon "Drink Reminder.app" 150 190 \
+    --hide-extension "Drink Reminder.app" \
+    --app-drop-link 450 190 \
+    "${artifact_path_dmg}" \
+    "${app_path}" >&2
+else
+  dmg_dir="${dist_dir}/dmg_tmp"
+  mkdir -p "${dmg_dir}"
+  cp -R "${app_path}" "${dmg_dir}/"
+  ln -s /Applications "${dmg_dir}/Applications"
 
-hdiutil create -volname "Drink Reminder" -srcfolder "${dmg_dir}" -ov -format UDZO "${artifact_path_dmg}" >&2
-rm -rf "${dmg_dir}"
+  hdiutil create -volname "Maa" -srcfolder "${dmg_dir}" -ov -format UDZO "${artifact_path_dmg}" >&2
+  rm -rf "${dmg_dir}"
+fi
 

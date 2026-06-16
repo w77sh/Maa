@@ -16,6 +16,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Install dependencies
+        run: brew install create-dmg
+
       - name: Build release packages
         id: package
         env:
