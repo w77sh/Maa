@@ -25,9 +25,9 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		5F3467CC2F5E6E0F0077A804 /* Drink Reminder.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Drink Reminder.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		5F3467CC2F5E6E0F0077A804 /* Maa'.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Maa'.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		6F0EA1B6CBC6180D255702EE /* ReminderSchedulerTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = ReminderSchedulerTests.swift; sourceTree = "<group>"; };
-		777FBC9261970D4E88173E30 /* Drink ReminderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Drink ReminderTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		777FBC9261970D4E88173E30 /* Drink ReminderTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; name = "Drink ReminderTests.xctest"; path = "Maa'.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		A1BFFE6613CF4AA7C463CCBF /* XCTest.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = XCTest.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/XCTest.framework; sourceTree = DEVELOPER_DIR; };
 		B2E457376702725052260C27 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = Platforms/MacOSX.platform/Developer/SDKs/MacOSX15.0.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = DEVELOPER_DIR; };
 		C9C9D5B7C53A6F1DE7C84462 /* SettingsStoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = SettingsStoreTests.swift; sourceTree = "<group>"; };
@@ -36,8 +36,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5F3467CE2F5E6E0F0077A804 /* Drink Reminder */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = "Drink Reminder";
 			sourceTree = "<group>";
 		};
@@ -77,7 +75,7 @@
 		5F3467CD2F5E6E0F0077A804 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5F3467CC2F5E6E0F0077A804 /* Drink Reminder.app */,
+				5F3467CC2F5E6E0F0077A804 /* Maa'.app */,
 				777FBC9261970D4E88173E30 /* Drink ReminderTests.xctest */,
 			);
 			name = Products;
@@ -130,7 +128,7 @@
 			);
 			name = "Drink Reminder";
 			productName = "Drink Reminder";
-			productReference = 5F3467CC2F5E6E0F0077A804 /* Drink Reminder.app */;
+			productReference = 5F3467CC2F5E6E0F0077A804 /* Maa'.app */;
 			productType = "com.apple.product-type.application";
 		};
 		F5560F8FB333ABA8F1ACC52B /* Drink ReminderTests */ = {
@@ -429,6 +427,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Drink Reminder/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_SUFeedURL = "https://github.com/w77sh/Maa/releases/latest/download/appcast.xml";
@@ -465,6 +464,7 @@
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = "Drink Reminder/Info.plist";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
 				INFOPLIST_KEY_SUFeedURL = "https://github.com/w77sh/Maa/releases/latest/download/appcast.xml";

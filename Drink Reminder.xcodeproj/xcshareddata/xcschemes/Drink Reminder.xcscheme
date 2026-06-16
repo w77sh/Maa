@@ -15,7 +15,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "5F3467CB2F5E6E0F0077A804"
-               BuildableName = "Drink Reminder.app"
+               BuildableName = "Maa&apos;.app"
                BlueprintName = "Drink Reminder"
                ReferencedContainer = "container:Drink Reminder.xcodeproj">
             </BuildableReference>
@@ -29,7 +29,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F5560F8FB333ABA8F1ACC52B"
-               BuildableName = "Drink ReminderTests.xctest"
+               BuildableName = "Maa&apos;.xctest"
                BlueprintName = "Drink ReminderTests"
                ReferencedContainer = "container:Drink Reminder.xcodeproj">
             </BuildableReference>
@@ -45,7 +45,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5F3467CB2F5E6E0F0077A804"
-            BuildableName = "Drink Reminder.app"
+            BuildableName = "Maa&apos;.app"
             BlueprintName = "Drink Reminder"
             ReferencedContainer = "container:Drink Reminder.xcodeproj">
          </BuildableReference>
@@ -56,7 +56,7 @@
             <BuildableReference
                BuildableIdentifier = "primary"
                BlueprintIdentifier = "F5560F8FB333ABA8F1ACC52B"
-               BuildableName = "Drink ReminderTests.xctest"
+               BuildableName = "Maa&apos;.xctest"
                BlueprintName = "Drink ReminderTests"
                ReferencedContainer = "container:Drink Reminder.xcodeproj">
             </BuildableReference>
@@ -78,7 +78,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5F3467CB2F5E6E0F0077A804"
-            BuildableName = "Drink Reminder.app"
+            BuildableName = "Maa&apos;.app"
             BlueprintName = "Drink Reminder"
             ReferencedContainer = "container:Drink Reminder.xcodeproj">
          </BuildableReference>
@@ -95,7 +95,7 @@
          <BuildableReference
             BuildableIdentifier = "primary"
             BlueprintIdentifier = "5F3467CB2F5E6E0F0077A804"
-            BuildableName = "Drink Reminder.app"
+            BuildableName = "Maa&apos;.app"
             BlueprintName = "Drink Reminder"
             ReferencedContainer = "container:Drink Reminder.xcodeproj">
          </BuildableReference>

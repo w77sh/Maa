@@ -48,3 +48,35 @@ jobs:
             Download the DMG file to install Maa on your Mac. You can also download the zip if preferred.
             
             Note: this package is unsigned by default, so macOS Gatekeeper may require opening once via right-click -> Open.
+
+      - name: Update Homebrew Cask
+        env:
+          HOMEBREW_TAP_TOKEN: ${{ secrets.HOMEBREW_TAP_TOKEN }}
+        run: |
+          if [ -z "$HOMEBREW_TAP_TOKEN" ]; then
+            echo "HOMEBREW_TAP_TOKEN is not set. Skipping Homebrew update."
+            exit 0
+          fi
+          
+          dmg_file=$(ls dist/*.dmg | head -n 1)
+          dmg_sha256=$(shasum -a 256 "$dmg_file" | awk '{print $1}')
+          
+          version="${{ github.ref_name }}"
+          version="${version#v}"
+          
+          git clone https://x-access-token:${HOMEBREW_TAP_TOKEN}@github.com/${{ github.repository_owner }}/homebrew-tap.git tap-repo
+          cd tap-repo
+          
+          cask_file="Casks/maa.rb"
+          sed -i '' "s/version \".*\"/version \"${version}\"/" "$cask_file"
+          sed -i '' "s/sha256 \".*\"/sha256 \"${dmg_sha256}\"/" "$cask_file"
+          
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add "$cask_file"
+          if git diff --staged --quiet; then
+            echo "No changes to commit."
+          else
+            git commit -m "Update Maa to ${version}"
+            git push
+          fi
