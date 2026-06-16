@@ -134,11 +134,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 class MaaUpdaterController {
     let standardUpdaterController: SPUStandardUpdaterController
 
+    private let delegate = UpdaterDelegate()
+
     init() {
-        standardUpdaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+        standardUpdaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: delegate, userDriverDelegate: nil)
     }
 
     func checkForUpdates() {
         standardUpdaterController.checkForUpdates(nil)
+    }
+}
+
+class UpdaterDelegate: NSObject, SPUUpdaterDelegate {
+    func feedURLString(for updater: SPUUpdater) -> String? {
+        return "https://github.com/w77sh/Maa/releases/latest/download/appcast.xml"
     }
 }
