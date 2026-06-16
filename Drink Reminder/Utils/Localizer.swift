@@ -64,7 +64,19 @@ enum Localizer {
         "Last 7 Days": "آخر ٧ أيام",
         "Last 30 Days": "آخر ٣٠ يوماً",
         "Time Range": "النطاق الزمني",
-        "Goal Reached": "تم الوصول للهدف"
+        "Goal Reached": "تم الوصول للهدف",
+        "Check for updates": "التحقق من التحديثات",
+        "Update Check Failed": "فشل التحقق من التحديث",
+        "Could not connect to GitHub.": "تعذر الاتصال بخوادم التحديث.",
+        "Update Available": "تحديث متاح",
+        "A new version (%@) is available!": "يتوفر إصدار جديد (%@)!",
+        "Download": "تحميل",
+        "Cancel": "إلغاء",
+        "Up to Date": "مُحدّث",
+        "You have the latest version.": "لديك أحدث إصدار.",
+        "Invalid response from GitHub.": "استجابة غير صالحة من الخادم.",
+        "Error parsing response.": "خطأ في قراءة البيانات.",
+        "OK": "حسناً"
     ]
 
     static func string(_ key: String, lang: AppLanguage) -> String {

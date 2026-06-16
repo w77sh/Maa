@@ -72,6 +72,13 @@ struct MenuBarView: View {
             }
             .buttonStyle(.plain)
 
+            Button(action: {
+                UpdateManager.shared.checkForUpdates(language: reminderManager.settings.language)
+            }) {
+                Label("Check for updates".localized(reminderManager.settings.language), systemImage: "arrow.triangle.2.circlepath")
+            }
+            .buttonStyle(.plain)
+
             Divider()
 
             // App Management Section
