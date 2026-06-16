@@ -25,6 +25,18 @@ struct Drink_ReminderApp: App {
         Task { @MainActor in
             for await _ in NotificationCenter.default.notifications(named: NSApplication.didFinishLaunchingNotification).prefix(1) {
                 await reminderManager.requestNotificationAuthorizationOnLaunchIfNeeded()
+                
+                if reminderManager.settings.enableNotification && reminderManager.notificationAuthorizationStatus == .denied {
+                    let alert = NSAlert()
+                    alert.messageText = "Notifications Disabled".localized(reminderManager.settings.language)
+                    alert.informativeText = "Please enable notifications in System Settings to receive drink reminders.".localized(reminderManager.settings.language)
+                    alert.addButton(withTitle: "Open System Settings".localized(reminderManager.settings.language))
+                    alert.addButton(withTitle: "Cancel".localized(reminderManager.settings.language))
+                    
+                    if alert.runModal() == .alertFirstButtonReturn {
+                        reminderManager.openSystemNotificationSettings()
+                    }
+                }
             }
         }
     }

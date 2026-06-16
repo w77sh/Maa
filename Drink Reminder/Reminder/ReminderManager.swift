@@ -90,6 +90,14 @@ final class ReminderManager {
         notificationManager.openSystemNotificationSettings()
     }
 
+    func sendTestNotification() async {
+        if notificationAuthorizationStatus != .authorized {
+            await refreshNotificationAuthorizationStatus(requestIfNeeded: true)
+        }
+        guard notificationAuthorizationStatus == .authorized else { return }
+        await notificationManager.sendReminder(language: settings.language)
+    }
+
     func handleTimerTick() {
         handleTimerTick(now: Date())
     }

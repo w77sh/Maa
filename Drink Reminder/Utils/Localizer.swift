@@ -76,7 +76,10 @@ enum Localizer {
         "You have the latest version.": "لديك أحدث إصدار.",
         "Invalid response from GitHub.": "استجابة غير صالحة من الخادم.",
         "Error parsing response.": "خطأ في قراءة البيانات.",
-        "OK": "حسناً"
+        "OK": "حسناً",
+        "Test Notification": "تجربة الإشعارات",
+        "Please enable notifications in System Settings to receive drink reminders.": "يرجى تفعيل الإشعارات من إعدادات النظام لتلقي تذكيرات شرب الماء.",
+        "Open System Settings": "فتح إعدادات النظام"
     ]
 
     static func string(_ key: String, lang: AppLanguage) -> String {

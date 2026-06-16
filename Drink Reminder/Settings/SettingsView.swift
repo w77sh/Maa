@@ -23,6 +23,7 @@ struct SettingsView: View {
     @State private var drinkPortionMilliliters: Int = 250
     @State private var language: AppLanguage = .english
     @State private var validationMessage: String?
+    @State private var showingNotificationAlert = false
 
     private let calendar = Calendar.current
 
@@ -65,6 +66,12 @@ struct SettingsView: View {
                 Toggle("System Notification".localized(lang), isOn: $enableNotification)
                 Toggle("Popup Window".localized(lang), isOn: $enablePopupWindow)
 
+                Button("Test Notification".localized(lang)) {
+                    Task {
+                        await reminderManager.sendTestNotification()
+                    }
+                }
+
                 if enableNotification && reminderManager.notificationAuthorizationStatus == .denied {
                     Button("Enable notifications in System Settings".localized(lang)) {
                         reminderManager.openSystemNotificationSettings()
@@ -103,7 +110,6 @@ struct SettingsView: View {
         .onChange(of: customIntervalText) { _, _ in updateSettings() }
         .onChange(of: startTime) { _, _ in updateSettings() }
         .onChange(of: endTime) { _, _ in updateSettings() }
-        .onChange(of: enableNotification) { _, _ in updateSettings() }
         .onChange(of: enablePopupWindow) { _, _ in updateSettings() }
         .onChange(of: runAtLogin) { _, newValue in
             updateSettings()
@@ -112,6 +118,29 @@ struct SettingsView: View {
         .onChange(of: dailyGoalLiters) { _, _ in updateSettings() }
         .onChange(of: drinkPortionMilliliters) { _, _ in updateSettings() }
         .onChange(of: language) { _, _ in updateSettings() }
+        .onAppear {
+            checkAndShowAlertIfNeeded()
+        }
+        .onChange(of: enableNotification) { _, newValue in
+            updateSettings()
+            if newValue {
+                checkAndShowAlertIfNeeded()
+            }
+        }
+        .alert("Notifications Disabled".localized(lang), isPresented: $showingNotificationAlert) {
+            Button("Open System Settings".localized(lang)) {
+                reminderManager.openSystemNotificationSettings()
+            }
+            Button("Cancel".localized(lang), role: .cancel) { }
+        } message: {
+            Text("Please enable notifications in System Settings to receive drink reminders.".localized(lang))
+        }
+    }
+
+    private func checkAndShowAlertIfNeeded() {
+        if enableNotification && reminderManager.notificationAuthorizationStatus == .denied {
+            showingNotificationAlert = true
+        }
     }
 
     private func updateSettings() {
