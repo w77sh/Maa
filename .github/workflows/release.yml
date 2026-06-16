@@ -32,9 +32,11 @@ jobs:
         env:
           SPARKLE_EDDSA_PRIVATE_KEY: ${{ secrets.SPARKLE_EDDSA_PRIVATE_KEY }}
         run: |
-          mkdir -p Sparkle-Bin
+          mkdir -p Sparkle-Bin appcast_work
           curl -sL https://github.com/sparkle-project/Sparkle/releases/download/2.6.4/Sparkle-2.6.4.tar.xz | tar -xJ -C Sparkle-Bin
-          echo "$SPARKLE_EDDSA_PRIVATE_KEY" | ./Sparkle-Bin/bin/generate_appcast --ed-key-file - dist/
+          cp dist/*.dmg appcast_work/
+          echo "$SPARKLE_EDDSA_PRIVATE_KEY" | ./Sparkle-Bin/bin/generate_appcast --ed-key-file - appcast_work/
+          cp appcast_work/appcast.xml dist/
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
