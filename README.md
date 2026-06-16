@@ -1,14 +1,19 @@
-# Drink Reminder
+# Maa'
 
-Drink Reminder is a lightweight macOS menu bar app that reminds you to drink water during the hours you choose.
+Maa' is a lightweight macOS menu bar app that reminds you to drink water during the hours you choose.
 
 It lives in the menu bar, sends reminders at a fixed interval, and lets you quickly snooze, pause, or log a drink.
 
+## Screenshots
+
+<!-- Add your screenshots here. For example: -->
+<!-- ![Menu Bar App](path/to/screenshot1.png) -->
+<!-- ![Settings Window](path/to/screenshot2.png) -->
 ## Download and install
 
-1. Download the latest `Drink Reminder.app.zip` from GitHub Releases.
+1. Download the latest `Maa'.app.zip` from GitHub Releases.
 2. Unzip the file.
-3. Drag `Drink Reminder.app` into your `Applications` folder.
+3. Drag `Maa'.app` into your `Applications` folder.
 4. Open the app.
 
 After the app launches, you should see a water bottle icon in the macOS menu bar.
@@ -22,7 +27,7 @@ Try these options in order:
 ### Option 1: Open from the context menu
 
 1. Open `Applications`.
-2. Find `Drink Reminder.app`.
+2. Find `Maa'.app`.
 3. Right-click the app and choose `Open`.
 4. Click `Open` again in the confirmation dialog.
 
@@ -35,7 +40,7 @@ If you already tried to open it and macOS blocked it:
 1. Open `System Settings`.
 2. Go to `Privacy & Security`.
 3. Scroll down to the security section.
-4. Look for a message saying `Drink Reminder` was blocked.
+4. Look for a message saying `Maa'` was blocked.
 5. Click `Open Anyway`.
 6. Confirm by clicking `Open`.
 
