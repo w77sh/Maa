@@ -252,12 +252,17 @@ final class ReminderManager {
             state.nextReminderTime = nil
         }
 
-        state.nextReminderTime = ReminderScheduler.calculateNextReminder(
-            now: now,
-            state: state,
-            settings: settings,
-            calendar: calendar
-        )
+        let goal = Int(settings.dailyGoalLiters * 1000)
+        if goal > 0 && state.consumedMilliliters >= goal {
+            state.nextReminderTime = nil
+        } else {
+            state.nextReminderTime = ReminderScheduler.calculateNextReminder(
+                now: now,
+                state: state,
+                settings: settings,
+                calendar: calendar
+            )
+        }
         stateStore.save(state)
     }
 
