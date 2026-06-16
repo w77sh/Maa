@@ -45,7 +45,7 @@ enum Localizer {
         "Next reminder: %@": "التذكير التالي: %@",
         "Daily Goal: %.1f liters": "الهدف اليومي: %.1f لتر",
         "Drink Portion: %d ml": "كمية الشرب: %d مل",
-        "Drink Reminder": "مذكّر الشرب",
+        "Maa": "ماء",
         "Interval must be at least 5 minutes.": "يجب أن تكون الفترة ٥ دقائق على الأقل.",
         "End time must be later than start time.": "يجب أن يكون وقت الانتهاء بعد وقت البدء.",
         "Popup Window": "نافذة منبثقة",

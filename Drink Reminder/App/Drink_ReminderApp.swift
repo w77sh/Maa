@@ -34,7 +34,7 @@ struct Drink_ReminderApp: App {
                 .environment(\.layoutDirection, reminderManager.settings.language == .arabic ? .rightToLeft : .leftToRight)
         } label: {
             menuBarIcon
-                .accessibilityLabel("Drink Reminder".localized(reminderManager.settings.language))
+                .accessibilityLabel("Maa".localized(reminderManager.settings.language))
         }
         .menuBarExtraStyle(.menu)
 

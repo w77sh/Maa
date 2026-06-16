@@ -35,6 +35,6 @@ jobs:
           overwrite_files: true
           generate_release_notes: true
           body: |
-            Download the DMG file to install Drink Reminder on your Mac. You can also download the zip if preferred.
+            Download the DMG file to install Maa on your Mac. You can also download the zip if preferred.
             
             Note: this package is unsigned by default, so macOS Gatekeeper may require opening once via right-click -> Open.

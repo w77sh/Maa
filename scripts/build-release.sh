@@ -49,8 +49,8 @@ fi
 
 version="$(defaults read "${app_path}/Contents/Info" CFBundleShortVersionString)"
 build_number="$(defaults read "${app_path}/Contents/Info" CFBundleVersion)"
-artifact_name_zip="Drink-Reminder-${version}-${build_number}-macOS.zip"
-artifact_name_dmg="Drink-Reminder-${version}-${build_number}-macOS.dmg"
+artifact_name_zip="Maa-${version}-${build_number}-macOS.zip"
+artifact_name_dmg="Maa-${version}-${build_number}-macOS.dmg"
 artifact_path_zip="${dist_dir}/${artifact_name_zip}"
 artifact_path_dmg="${dist_dir}/${artifact_name_dmg}"
 
