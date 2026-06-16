@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		533299E16C080AD230679F50 /* ReminderSchedulerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6F0EA1B6CBC6180D255702EE /* ReminderSchedulerTests.swift */; };
-		985DB001C97F45F6966A2C22 /* Sparkle in Frameworks */ = {isa = PBXBuildFile; productRef = DCC59B5BF28719E2575005AF /* Sparkle */; };
 		9E0DE3A299C16D676D607BE6 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B2E457376702725052260C27 /* Cocoa.framework */; };
 		AD542AB0BF55A203E248E299 /* XCTest.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = A1BFFE6613CF4AA7C463CCBF /* XCTest.framework */; };
 		C8C22F3CAEE5C109A8B2F162 /* SettingsStoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = C9C9D5B7C53A6F1DE7C84462 /* SettingsStoreTests.swift */; };
@@ -36,8 +35,6 @@
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		5F3467CE2F5E6E0F0077A804 /* Drink Reminder */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
-			exceptions = (
-			);
 			path = "Drink Reminder";
 			sourceTree = "<group>";
 		};
@@ -48,7 +45,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				985DB001C97F45F6966A2C22 /* Sparkle in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -123,7 +119,6 @@
 			buildRules = (
 			);
 			dependencies = (
-				120AE1550C3FE8981749A1AF /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				5F3467CE2F5E6E0F0077A804 /* Drink Reminder */,
@@ -175,9 +170,6 @@
 			);
 			mainGroup = 5F3467C32F5E6E0F0077A804;
 			minimizedProjectReferenceProxies = 1;
-			packageReferences = (
-				BD69C56A288AF9E2810D1CDF /* XCRemoteSwiftPackageReference "Sparkle" */,
-			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 5F3467CD2F5E6E0F0077A804 /* Products */;
 			projectDirPath = "";
@@ -226,10 +218,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		120AE1550C3FE8981749A1AF /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			productRef = DCC59B5BF28719E2575005AF /* Sparkle */;
-		};
 		70198074B71336BD7F80ECE1 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			name = "Drink Reminder";
@@ -430,8 +418,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_SUFeedURL = "https://github.com/w77sh/Maa/releases/latest/download/appcast.xml";
-				INFOPLIST_KEY_SUPublicEDKey = "SDUX3j5Qgzg70V7S+IpBL1aGcvpJJnu3zzPEdyoWMtk=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -465,8 +451,6 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_LSUIElement = YES;
 				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				INFOPLIST_KEY_SUFeedURL = "https://github.com/w77sh/Maa/releases/latest/download/appcast.xml";
-				INFOPLIST_KEY_SUPublicEDKey = "SDUX3j5Qgzg70V7S+IpBL1aGcvpJJnu3zzPEdyoWMtk=";
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -516,25 +500,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		BD69C56A288AF9E2810D1CDF /* XCRemoteSwiftPackageReference "Sparkle" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/sparkle-project/Sparkle";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.6.4;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		DCC59B5BF28719E2575005AF /* Sparkle */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = BD69C56A288AF9E2810D1CDF /* XCRemoteSwiftPackageReference "Sparkle" */;
-			productName = Sparkle;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 5F3467C42F5E6E0F0077A804 /* Project object */;
 }

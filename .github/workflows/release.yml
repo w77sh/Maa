@@ -28,6 +28,14 @@ jobs:
           marketing_version="${MARKETING_VERSION_OVERRIDE#v}"
           MARKETING_VERSION_OVERRIDE="${marketing_version}" BUILD_NUMBER_OVERRIDE="${BUILD_NUMBER_OVERRIDE}" scripts/build-release.sh Release
 
+      - name: Generate Sparkle Appcast
+        env:
+          SPARKLE_EDDSA_PRIVATE_KEY: ${{ secrets.SPARKLE_EDDSA_PRIVATE_KEY }}
+        run: |
+          mkdir -p Sparkle-Bin
+          curl -sL https://github.com/sparkle-project/Sparkle/releases/download/2.6.4/Sparkle-2.6.4.tar.xz | tar -xJ -C Sparkle-Bin
+          echo "$SPARKLE_EDDSA_PRIVATE_KEY" | ./Sparkle-Bin/bin/generate_appcast --ed-key-file - dist/
+
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:

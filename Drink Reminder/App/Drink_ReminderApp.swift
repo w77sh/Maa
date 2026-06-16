@@ -1,5 +1,6 @@
 import AppKit
 import SwiftUI
+import Sparkle
 
 @main
 struct Drink_ReminderApp: App {
@@ -12,6 +13,7 @@ struct Drink_ReminderApp: App {
     private static let menuBarPausedFallbackSymbolName = "pause.fill"
 
     @State private var reminderManager: ReminderManager
+    @State private var updaterController = MaaUpdaterController()
 
     init() {
         let reminderManager = ReminderManager()
@@ -30,6 +32,7 @@ struct Drink_ReminderApp: App {
         MenuBarExtra {
             MenuBarView()
                 .environment(reminderManager)
+                .environment(updaterController)
                 .environment(\.locale, Locale(identifier: reminderManager.settings.language.rawValue))
                 .environment(\.layoutDirection, reminderManager.settings.language == .arabic ? .rightToLeft : .leftToRight)
         } label: {
@@ -41,6 +44,7 @@ struct Drink_ReminderApp: App {
         Settings {
             SettingsView()
                 .environment(reminderManager)
+                .environment(updaterController)
                 .environment(\.locale, Locale(identifier: reminderManager.settings.language.rawValue))
                 .environment(\.layoutDirection, reminderManager.settings.language == .arabic ? .rightToLeft : .leftToRight)
                 .frame(minWidth: 380, minHeight: 320)
@@ -122,5 +126,18 @@ struct Drink_ReminderApp: App {
 class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationShouldTerminateAfterLastWindowClosed(_ sender: NSApplication) -> Bool {
         return false
+    }
+}
+
+@Observable
+class MaaUpdaterController {
+    let standardUpdaterController: SPUStandardUpdaterController
+
+    init() {
+        standardUpdaterController = SPUStandardUpdaterController(startingUpdater: true, updaterDelegate: nil, userDriverDelegate: nil)
+    }
+
+    func checkForUpdates() {
+        standardUpdaterController.checkForUpdates(nil)
     }
 }

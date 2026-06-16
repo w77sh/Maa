@@ -12,6 +12,7 @@ import UserNotifications
 struct MenuBarView: View {
     @Environment(ReminderManager.self) private var reminderManager
     @Environment(\.openSettings) private var openSettings
+    @Environment(MaaUpdaterController.self) private var updaterController
 
     var body: some View {
         VStack(alignment: .leading, spacing: 8) {
@@ -73,7 +74,7 @@ struct MenuBarView: View {
             .buttonStyle(.plain)
 
             Button(action: {
-                UpdateManager.shared.checkForUpdates(language: reminderManager.settings.language)
+                updaterController.checkForUpdates()
             }) {
                 Label("Check for updates".localized(reminderManager.settings.language), systemImage: "arrow.triangle.2.circlepath")
             }
