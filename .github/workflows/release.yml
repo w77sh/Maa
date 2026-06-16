@@ -16,23 +16,22 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build release zip
+      - name: Build release packages
         id: package
         env:
           MARKETING_VERSION_OVERRIDE: ${{ github.ref_name }}
           BUILD_NUMBER_OVERRIDE: ${{ github.run_number }}
         run: |
           marketing_version="${MARKETING_VERSION_OVERRIDE#v}"
-          artifact_path="$(MARKETING_VERSION_OVERRIDE="${marketing_version}" BUILD_NUMBER_OVERRIDE="${BUILD_NUMBER_OVERRIDE}" scripts/build-release-zip.sh Release)"
-          echo "artifact_path=${artifact_path}" >> "$GITHUB_OUTPUT"
+          MARKETING_VERSION_OVERRIDE="${marketing_version}" BUILD_NUMBER_OVERRIDE="${BUILD_NUMBER_OVERRIDE}" scripts/build-release.sh Release
 
       - name: Publish GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: ${{ steps.package.outputs.artifact_path }}
+          files: dist/*
           overwrite_files: true
           generate_release_notes: true
           body: |
-            Download the zip, extract it, and move `Drink Reminder.app` into your Applications folder.
-
+            Download the DMG file to install Drink Reminder on your Mac. You can also download the zip if preferred.
+            
             Note: this package is unsigned by default, so macOS Gatekeeper may require opening once via right-click -> Open.

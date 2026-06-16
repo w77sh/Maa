@@ -49,13 +49,23 @@ fi
 
 version="$(defaults read "${app_path}/Contents/Info" CFBundleShortVersionString)"
 build_number="$(defaults read "${app_path}/Contents/Info" CFBundleVersion)"
-artifact_name="Drink-Reminder-${version}-${build_number}-macOS.zip"
-artifact_path="${dist_dir}/${artifact_name}"
+artifact_name_zip="Drink-Reminder-${version}-${build_number}-macOS.zip"
+artifact_name_dmg="Drink-Reminder-${version}-${build_number}-macOS.dmg"
+artifact_path_zip="${dist_dir}/${artifact_name_zip}"
+artifact_path_dmg="${dist_dir}/${artifact_name_dmg}"
 
 mkdir -p "${dist_dir}"
-rm -f "${artifact_path}"
+rm -f "${artifact_path_zip}" "${artifact_path_dmg}"
 
-echo "Packaging ${artifact_name}..." >&2
-ditto -c -k --sequesterRsrc --keepParent "${app_path}" "${artifact_path}"
+echo "Packaging ${artifact_name_zip}..." >&2
+ditto -c -k --sequesterRsrc --keepParent "${app_path}" "${artifact_path_zip}"
 
-echo "${artifact_path}"
+echo "Packaging ${artifact_name_dmg}..." >&2
+dmg_dir="${dist_dir}/dmg_tmp"
+mkdir -p "${dmg_dir}"
+cp -R "${app_path}" "${dmg_dir}/"
+ln -s /Applications "${dmg_dir}/Applications"
+
+hdiutil create -volname "Drink Reminder" -srcfolder "${dmg_dir}" -ov -format UDZO "${artifact_path_dmg}" >&2
+rm -rf "${dmg_dir}"
+
