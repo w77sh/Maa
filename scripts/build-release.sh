@@ -17,7 +17,7 @@ project_dir="$(cd "${script_dir}/.." && pwd)"
 project_path="${project_dir}/Drink Reminder.xcodeproj"
 scheme="Drink Reminder"
 derived_data_path="${project_dir}/.build/release"
-app_name="Drink Reminder.app"
+app_name="Maa'.app"
 app_path="${derived_data_path}/Build/Products/${configuration}/${app_name}"
 dist_dir="${project_dir}/dist"
 
@@ -68,8 +68,8 @@ if command -v create-dmg >/dev/null 2>&1; then
     --window-pos 200 120 \
     --window-size 600 400 \
     --icon-size 100 \
-    --icon "Drink Reminder.app" 150 190 \
-    --hide-extension "Drink Reminder.app" \
+    --icon "Maa'.app" 150 190 \
+    --hide-extension "Maa'.app" \
     --app-drop-link 450 190 \
     "${artifact_path_dmg}" \
     "${app_path}" >&2
