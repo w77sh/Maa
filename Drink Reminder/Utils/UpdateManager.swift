@@ -11,7 +11,10 @@ class UpdateManager {
     
     func checkForUpdates(language: AppLanguage) {
         let url = URL(string: "https://api.github.com/repos/w77sh/Maa/releases/latest")!
-        let task = URLSession.shared.dataTask(with: url) { data, response, error in
+        var request = URLRequest(url: url)
+        request.setValue("Maa-DrinkReminder", forHTTPHeaderField: "User-Agent")
+        
+        let task = URLSession.shared.dataTask(with: request) { data, response, error in
             DispatchQueue.main.async {
                 guard let data = data, error == nil else {
                     self.showAlert(title: "Update Check Failed".localized(language),
