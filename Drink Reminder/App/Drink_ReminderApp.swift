@@ -38,6 +38,7 @@ struct Drink_ReminderApp: App {
         } label: {
             menuBarIcon
                 .accessibilityLabel("Maa".localized(reminderManager.settings.language))
+                .id("\(reminderManager.state.consumedMilliliters)_\(reminderManager.shouldUsePausedMenuBarIcon)")
         }
         .menuBarExtraStyle(.menu)
 
