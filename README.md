@@ -91,8 +91,8 @@ You can install Maa' directly via Homebrew from the official custom tap:
 # Add the tap
 brew tap w77sh/tap
 
-# Install Maa'
-brew install --cask maa
+# Install Maa' (specify the full tap prefix to avoid conflicts with core casks)
+brew install --cask w77sh/tap/maa
 ```
 
 ### Method 2: Direct DMG Download
