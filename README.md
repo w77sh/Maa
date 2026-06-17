@@ -100,13 +100,31 @@ brew install --cask w77sh/tap/maa
 2. Download the latest `Maa-[Version]-[Build]-macOS.dmg` archive.
 3. Open the DMG and drag **Maa'** to your `Applications` directory.
 
-> [!NOTE]  
-> Because Maa' is distributed as a self-signed binary, macOS Gatekeeper may block launch on first run. To allow the app:
-> * Right-click `Maa'.app` in your Applications folder and select **Open**.
-> * Alternatively, strip the quarantine flag via terminal:
->   ```bash
->   xattr -dr com.apple.quarantine /Applications/Maa\'.app
->   ```
+### Bypassing macOS Gatekeeper Warning
+
+Because Maa' is distributed as a self-signed binary, macOS Gatekeeper may prevent it from opening on the first launch, showing the following warning:
+
+<p align="center">
+  <img src="docs/screenshots/gatekeeper-warning.png" width="380" alt="macOS Gatekeeper Warning" />
+</p>
+
+You can easily bypass this security check using one of two methods:
+
+#### Option 1: Right-Click to Open (No Terminal)
+1. Open your **Applications** folder in Finder.
+2. Locate **Maa'**.
+3. **Right-click** (or hold `Control` and click) the app icon, then choose **Open** from the context menu.
+4. A warning dialog will appear similar to the one above, but it will now include an **Open** button. Click **Open** to confirm.
+5. Once opened this way, macOS remembers the choice, and you can launch it normally in the future.
+
+*Note: If the dialog still doesn't show the Open button, open **System Settings** > **Privacy & Security**, scroll down to the Security section, and click **Open Anyway** next to the warning for Maa'.*
+
+#### Option 2: Run a Terminal Command
+If you prefer using the terminal, you can strip the macOS quarantine flag by running the following command:
+
+```bash
+xattr -dr com.apple.quarantine /Applications/Maa\'.app
+```
 
 ---
 
