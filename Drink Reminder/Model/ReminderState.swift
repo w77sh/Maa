@@ -11,7 +11,6 @@ struct ReminderState: Codable {
     var lastDrinkTime: Date?
     var nextReminderTime: Date?
     var isPausedToday: Bool
-    var snoozedUntil: Date?
     var lastProcessedDay: Date?
     var consumedMilliliters: Int
 
@@ -19,14 +18,12 @@ struct ReminderState: Codable {
         lastDrinkTime: Date? = nil,
         nextReminderTime: Date? = nil,
         isPausedToday: Bool = false,
-        snoozedUntil: Date? = nil,
         lastProcessedDay: Date? = nil,
         consumedMilliliters: Int = 0
     ) {
         self.lastDrinkTime = lastDrinkTime
         self.nextReminderTime = nextReminderTime
         self.isPausedToday = isPausedToday
-        self.snoozedUntil = snoozedUntil
         self.lastProcessedDay = lastProcessedDay
         self.consumedMilliliters = consumedMilliliters
     }

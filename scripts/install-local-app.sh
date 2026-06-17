@@ -15,7 +15,7 @@ project_dir="$(cd "${script_dir}/.." && pwd)"
 project_path="${project_dir}/Drink Reminder.xcodeproj"
 scheme="Drink Reminder"
 derived_data_path="${project_dir}/.build"
-app_name="Drink Reminder.app"
+app_name="Maa'.app"
 built_app_path="${derived_data_path}/Build/Products/${configuration}/${app_name}"
 install_dir="${HOME}/Applications"
 install_app_path="${install_dir}/${app_name}"
@@ -36,9 +36,9 @@ fi
 
 mkdir -p "${install_dir}"
 
-if pgrep -x "Drink Reminder" >/dev/null 2>&1; then
+if pgrep -f "Maa'.app" >/dev/null 2>&1 || pgrep -x "Maa'" >/dev/null 2>&1; then
   echo "Stopping running app..."
-  pkill -x "Drink Reminder" || true
+  pkill -f "Maa'.app" || pkill -x "Maa'" || true
   sleep 1
 fi
 

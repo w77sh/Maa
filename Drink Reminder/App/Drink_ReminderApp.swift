@@ -51,9 +51,20 @@ struct Drink_ReminderApp: App {
         } label: {
             menuBarIcon
                 .accessibilityLabel("Maa".localized(reminderManager.settings.language))
-                .id("\(reminderManager.state.consumedMilliliters)_\(reminderManager.shouldUsePausedMenuBarIcon)")
+                .id("\(reminderManager.state.consumedMilliliters)_\(reminderManager.shouldUsePausedMenuBarIcon)_\(reminderManager.settings.coloredMenuBarIcon)")
         }
-        .menuBarExtraStyle(.menu)
+        .menuBarExtraStyle(.window)
+
+        Window("Drinking Statistics".localized(reminderManager.settings.language), id: "statistics") {
+            StatisticsView(
+                historyStore: reminderManager.historyStore,
+                dailyGoalMilliliters: Int(reminderManager.settings.dailyGoalLiters * 1000)
+            )
+                .environment(reminderManager)
+                .environment(\.locale, Locale(identifier: reminderManager.settings.language.rawValue))
+                .environment(\.layoutDirection, reminderManager.settings.language == .arabic ? .rightToLeft : .leftToRight)
+                .frame(minWidth: 400, minHeight: 300)
+        }
 
         Settings {
             SettingsView()
@@ -122,13 +133,47 @@ struct Drink_ReminderApp: App {
                 
                 let tintedFill = fill.copy() as! NSImage
                 tintedFill.lockFocus()
-                NSColor.systemBlue.set()
+                if reminderManager.settings.coloredMenuBarIcon {
+                    NSColor.systemBlue.set()
+                } else {
+                    NSColor.labelColor.set()
+                }
                 NSRect(origin: .zero, size: tintedFill.size).fill(using: .sourceAtop)
                 tintedFill.unlockFocus()
                 
                 tintedFill.draw(in: drawRect)
                 
                 NSGraphicsContext.current?.restoreGraphicsState()
+            }
+
+            if progress >= 1.0 {
+                let badgeSize: CGFloat = 8.5
+                let badgeRect = NSRect(x: drawRect.maxX - badgeSize + 2,
+                                       y: drawRect.minY - 2,
+                                       width: badgeSize,
+                                       height: badgeSize)
+                
+                let greenCircle = NSBezierPath(ovalIn: badgeRect)
+                NSColor.systemGreen.set()
+                greenCircle.fill()
+                
+                let checkConfig = NSImage.SymbolConfiguration(pointSize: 6, weight: .bold)
+                if let checkSymbol = NSImage(systemSymbolName: "checkmark", accessibilityDescription: nil)?
+                    .withSymbolConfiguration(checkConfig) {
+                    
+                    let checkRect = NSRect(x: badgeRect.midX - checkSymbol.size.width / 2,
+                                           y: badgeRect.midY - checkSymbol.size.height / 2,
+                                           width: checkSymbol.size.width,
+                                           height: checkSymbol.size.height)
+                    
+                    let tintedCheck = checkSymbol.copy() as! NSImage
+                    tintedCheck.lockFocus()
+                    NSColor.white.set()
+                    NSRect(origin: .zero, size: tintedCheck.size).fill(using: .sourceAtop)
+                    tintedCheck.unlockFocus()
+                    
+                    tintedCheck.draw(in: checkRect)
+                }
             }
             return true
         }
@@ -148,6 +193,19 @@ class AppDelegate: NSObject, NSApplicationDelegate, UNUserNotificationCenterDele
 
     func userNotificationCenter(_ center: UNUserNotificationCenter, willPresent notification: UNNotification, withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions) -> Void) {
         completionHandler([.banner, .sound])
+    }
+
+    func userNotificationCenter(_ center: UNUserNotificationCenter, didReceive response: UNNotificationResponse, withCompletionHandler completionHandler: @escaping () -> Void) {
+        // App is injected with ReminderManager as environment, but AppDelegate needs access to it.
+        // I can broadcast a notification or access it via a shared instance if available.
+        // Wait, ReminderManager is @State in App. I should observe NotificationCenter.
+        switch response.actionIdentifier {
+        case "DRINK_ACTION":
+            NotificationCenter.default.post(name: NSNotification.Name("DrinkActionTriggered"), object: nil)
+        default:
+            break
+        }
+        completionHandler()
     }
 }
 

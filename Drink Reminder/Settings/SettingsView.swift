@@ -17,89 +17,112 @@ struct SettingsView: View {
     @State private var startTime = Date()
     @State private var endTime = Date()
     @State private var enableNotification = true
-    @State private var enablePopupWindow = true
     @State private var runAtLogin = false
     @State private var dailyGoalLiters: Double = 2.0
     @State private var drinkPortionMilliliters: Int = 250
     @State private var language: AppLanguage = .english
     @State private var validationMessage: String?
     @State private var showingNotificationAlert = false
+    @State private var coloredMenuBarIcon = true
 
     private let calendar = Calendar.current
 
     var body: some View {
         let lang = reminderManager.settings.language
-        Form {
-            Section("General".localized(lang)) {
-                Toggle("Run automatically at login".localized(lang), isOn: $runAtLogin)
-            }
-            
-            Section("Goal".localized(lang)) {
-                Stepper(value: $dailyGoalLiters, in: 0.5...10, step: 0.1) {
-                    Text(String(format: "Daily Goal: %.1f liters".localized(lang), dailyGoalLiters))
+        TabView {
+            // General Tab
+            Form {
+                Section("General".localized(lang)) {
+                    Toggle("Run automatically at login".localized(lang), isOn: $runAtLogin)
+                    Toggle("Colored Menu Bar Icon".localized(lang), isOn: $coloredMenuBarIcon)
                 }
                 
-                Stepper(value: $drinkPortionMilliliters, in: 50...1000, step: 50) {
-                    Text(String(format: "Drink Portion: %d ml".localized(lang), drinkPortionMilliliters))
-                }
-            }
-
-            Section("Interval".localized(lang)) {
-                Picker("Reminder Interval".localized(lang), selection: $intervalChoice) {
-                    ForEach(IntervalChoice.allCases) { choice in
-                        Text(choice.title(for: lang)).tag(choice)
-                    }
-                }
-
-                if intervalChoice == .custom {
-                    TextField("Custom interval (minutes)".localized(lang), text: $customIntervalText)
-                        .textFieldStyle(.roundedBorder)
-                }
-            }
-
-            Section("Reminder Time Range".localized(lang)) {
-                DatePicker("Start Time".localized(lang), selection: $startTime, displayedComponents: .hourAndMinute)
-                DatePicker("End Time".localized(lang), selection: $endTime, displayedComponents: .hourAndMinute)
-            }
-
-            Section("Reminder Mode".localized(lang)) {
-                Toggle("System Notification".localized(lang), isOn: $enableNotification)
-                Toggle("Popup Window".localized(lang), isOn: $enablePopupWindow)
-
-                Button("Test Notification".localized(lang)) {
-                    Task {
-                        await reminderManager.sendTestNotification()
-                    }
-                }
-
-                if enableNotification && reminderManager.notificationAuthorizationStatus == .denied {
-                    Button("Enable notifications in System Settings".localized(lang)) {
-                        reminderManager.openSystemNotificationSettings()
-                    }
-                    .buttonStyle(.plain)
-                    .font(.callout)
-                    .foregroundStyle(.secondary)
-                }
-            }
-
-            Section("Language".localized(lang)) {
-                Picker("Language".localized(lang), selection: $language) {
-                    ForEach(AppLanguage.allCases) { choice in
-                        Text(choice.title).tag(choice)
+                Section("Language".localized(lang)) {
+                    Picker("Language".localized(lang), selection: $language) {
+                        ForEach(AppLanguage.allCases) { choice in
+                            Text(choice.title).tag(choice)
+                        }
                     }
                 }
             }
-
-            if let validationMessage {
-                Section {
-                    Text(validationMessage.localized(lang))
-                        .foregroundStyle(.red)
+            .formStyle(.grouped)
+            .tabItem { Label("General".localized(lang), systemImage: "gearshape") }
+            .tag("general")
+            
+            // Goal Tab
+            Form {
+                Section("Goal".localized(lang)) {
+                    Stepper(value: $dailyGoalLiters, in: 0.5...10, step: 0.1) {
+                        Text(String(format: "Daily Goal: %.1f liters".localized(lang), dailyGoalLiters))
+                    }
+                    
+                    Stepper(value: $drinkPortionMilliliters, in: 50...1000, step: 50) {
+                        Text(String(format: "Drink Portion: %d ml".localized(lang), drinkPortionMilliliters))
+                    }
                 }
             }
+            .formStyle(.grouped)
+            .tabItem { Label("Goal".localized(lang), systemImage: "target") }
+            .tag("goal")
+            
+            // Schedule Tab
+            Form {
+                Section("Interval".localized(lang)) {
+                    Picker("Reminder Interval".localized(lang), selection: $intervalChoice) {
+                        ForEach(IntervalChoice.allCases) { choice in
+                            Text(choice.title(for: lang)).tag(choice)
+                        }
+                    }
 
+                    if intervalChoice == .custom {
+                        Stepper(value: Binding(
+                            get: { Int(customIntervalText) ?? 60 },
+                            set: { customIntervalText = String($0) }
+                        ), in: 1...1440, step: 5) {
+                            Text(String(format: "%d minutes".localized(lang), Int(customIntervalText) ?? 60))
+                        }
+                    }
+                }
+
+                Section("Reminder Time Range".localized(lang)) {
+                    DatePicker("Start Time".localized(lang), selection: $startTime, displayedComponents: .hourAndMinute)
+                        .datePickerStyle(.compact)
+                    DatePicker("End Time".localized(lang), selection: $endTime, displayedComponents: .hourAndMinute)
+                        .datePickerStyle(.compact)
+                }
+
+                Section("Reminder Mode".localized(lang)) {
+                    Toggle("System Notification".localized(lang), isOn: $enableNotification)
+
+                    Button("Test Notification".localized(lang)) {
+                        Task {
+                            await reminderManager.sendTestNotification()
+                        }
+                    }
+
+                    if enableNotification && reminderManager.notificationAuthorizationStatus == .denied {
+                        Button("Enable notifications in System Settings".localized(lang)) {
+                            reminderManager.openSystemNotificationSettings()
+                        }
+                        .buttonStyle(.plain)
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                    }
+                }
+                
+                if let validationMessage {
+                    Section {
+                        Text(validationMessage.localized(lang))
+                            .foregroundStyle(.red)
+                    }
+                }
+            }
+            .formStyle(.grouped)
+            .tabItem { Label("Schedule".localized(lang), systemImage: "calendar") }
+            .tag("schedule")
         }
-        .formStyle(.grouped)
         .padding()
+        .frame(width: 450, height: 350)
         .task {
             sync(from: reminderManager.settings)
         }
@@ -110,7 +133,6 @@ struct SettingsView: View {
         .onChange(of: customIntervalText) { _, _ in updateSettings() }
         .onChange(of: startTime) { _, _ in updateSettings() }
         .onChange(of: endTime) { _, _ in updateSettings() }
-        .onChange(of: enablePopupWindow) { _, _ in updateSettings() }
         .onChange(of: runAtLogin) { _, newValue in
             updateSettings()
             updateLoginItem(enabled: newValue)
@@ -118,6 +140,7 @@ struct SettingsView: View {
         .onChange(of: dailyGoalLiters) { _, _ in updateSettings() }
         .onChange(of: drinkPortionMilliliters) { _, _ in updateSettings() }
         .onChange(of: language) { _, _ in updateSettings() }
+        .onChange(of: coloredMenuBarIcon) { _, _ in updateSettings() }
         .onAppear {
             checkAndShowAlertIfNeeded()
         }
@@ -163,7 +186,7 @@ struct SettingsView: View {
             dailyGoalLiters: dailyGoalLiters,
             drinkPortionMilliliters: drinkPortionMilliliters,
             language: language,
-            enablePopupWindow: enablePopupWindow
+            coloredMenuBarIcon: coloredMenuBarIcon
         )
 
         if updatedSettings != reminderManager.settings {
@@ -192,11 +215,11 @@ struct SettingsView: View {
         startTime = calendar.date(bySettingHour: settings.startHour, minute: settings.startMinute, second: 0, of: now) ?? now
         endTime = calendar.date(bySettingHour: settings.endHour, minute: settings.endMinute, second: 0, of: now) ?? now
         enableNotification = settings.enableNotification
-        enablePopupWindow = settings.enablePopupWindow
         runAtLogin = settings.runAtLogin
         dailyGoalLiters = settings.dailyGoalLiters
         drinkPortionMilliliters = settings.drinkPortionMilliliters
         language = settings.language
+        coloredMenuBarIcon = settings.coloredMenuBarIcon
     }
 
     private var resolvedIntervalMinutes: Int? {

@@ -57,6 +57,11 @@ artifact_path_dmg="${dist_dir}/${artifact_name_dmg}"
 mkdir -p "${dist_dir}"
 rm -f "${artifact_path_zip}" "${artifact_path_dmg}"
 
+if [[ -f "${project_dir}/release-notes.html" ]]; then
+  echo "Copying release notes..." >&2
+  cp "${project_dir}/release-notes.html" "${dist_dir}/Maa-${version}-${build_number}-macOS.html"
+fi
+
 echo "Packaging ${artifact_name_zip}..." >&2
 ditto -c -k --sequesterRsrc --keepParent "${app_path}" "${artifact_path_zip}"
 

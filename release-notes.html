@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Maa' Update / تحديث Maa'</title>
+    <style>
+        :root {
+            --bg-color: #ffffff;
+            --text-color: #1d1d1f;
+            --accent-color: #0071e3;
+            --secondary-bg: #f5f5f7;
+            --border-color: #d2d2d7;
+            --success-color: #34c759;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg-color: #1e1e1e;
+                --text-color: #f5f5f7;
+                --accent-color: #2997ff;
+                --secondary-bg: #2d2d2d;
+                --border-color: #424245;
+                --success-color: #30d158;
+                --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+            }
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 24px;
+            line-height: 1.6;
+        }
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        .logo {
+            font-size: 48px;
+            margin-bottom: 8px;
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-8px); }
+            100% { transform: translateY(0px); }
+        }
+        h1 {
+            font-size: 24px;
+            margin: 0 0 8px 0;
+            font-weight: 700;
+        }
+        .version-badge {
+            display: inline-block;
+            background-color: var(--accent-color);
+            color: #ffffff;
+            padding: 4px 14px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 6px;
+            margin-top: 32px;
+            margin-bottom: 16px;
+        }
+        .features-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .feature-card {
+            background-color: var(--secondary-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--card-shadow);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .feature-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+        }
+        .feature-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0 0 6px 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .feature-desc {
+            font-size: 14px;
+            margin: 0;
+            opacity: 0.85;
+        }
+        .emoji {
+            font-size: 20px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            font-size: 12px;
+            opacity: 0.6;
+            border-top: 1px solid var(--border-color);
+            padding-top: 16px;
+        }
+        /* RTL support */
+        .rtl {
+            direction: rtl;
+            text-align: right;
+        }
+        .rtl .feature-title {
+            flex-direction: row;
+        }
+        .ltr {
+            direction: ltr;
+            text-align: left;
+        }
+        .ltr .feature-title {
+            flex-direction: row;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="logo">💧</div>
+            <h1>Maa' v1.0.13</h1>
+            <span class="version-badge">What's New / الجديد في التحديث</span>
+        </div>
+
+        <!-- Arabic Section -->
+        <div class="rtl">
+            <div class="section-title">الميزات الجديدة والتحديثات 🇸🇦</div>
+            <ul class="features-list">
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">🎨</span> أيقونة ملونة لشريط القوائم (Menu Bar)</div>
+                    <p class="feature-desc">خيار جديد في الإعدادات يتيح لك تفعيل أيقونة ملونة أو أحادية اللون لشريط القوائم العلوي لتناسب ذوقك وثيم جهازك.</p>
+                </li>
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">🌊</span> أنيميشن تفاعلي لكوب الماء</div>
+                    <p class="feature-desc">تصميم جديد كلياً لكوب الماء داخل نافذة شريط المهام مع مستوى ماء يتحرك بأنيميشن SwiftUI تفاعلي ناعم يعكس كمية استهلاكك اليومية.</p>
+                </li>
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">⏰</span> اختيار الوقت الخاص بالنظام (Native Time Picker)</div>
+                    <p class="feature-desc">استبدال طريقة كتابة أوقات التنبيه يدوياً بواجهة اختيار الوقت الأصلية لنظام macOS (Compact DatePicker) لتسهيل ضبط فترات التنبيه بدقة وسرعة.</p>
+                </li>
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">✨</span> تأثيرات تفاعلية للأزرار (Hover Effects)</div>
+                    <p class="feature-desc">إضافة تأثيرات حركية (Hover) ناعمة ومحسّنة لجميع الأزرار عند تمرير مؤشر الفأرة عليها لتمنحك شعوراً أكثر تفاعلية واستجابة.</p>
+                </li>
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">🎉</span> تهنئة مميزة عند تحقيق هدفك اليومي</div>
+                    <p class="feature-desc">عند اكتمال شرب كمية الماء المستهدفة لليوم، ستظهر لك رسالة تهنئة متحركة مميزة، وستتحول أيقونة شريط المهام لتظهر عليها علامة صح خضراء للإشادة بإنجازك.</p>
+                </li>
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">🧹</span> واجهة مستخدم مبسطة وخالية من المشتتات</div>
+                    <p class="feature-desc">حذف زر الغفوة (Snooze) بالكامل لتبسيط الواجهة وتركيز التطبيق على الأفعال الأساسية والهامة فقط.</p>
+                </li>
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">🌐</span> دعم كامل ومحسّن للغة العربية</div>
+                    <p class="feature-desc">إصلاح اتجاهات الواجهة والنصوص ودعم الترجمة الكاملة للغة العربية بشكل ديناميكي، مع إعادة هيكلة ملفات الترجمة بشكل منفصل ليسهل على المطورين إضافة لغات أخرى مستقبلاً.</p>
+                </li>
+            </ul>
+        </div>
+
+        <!-- English Section -->
+        <div class="ltr">
+            <div class="section-title">New Features & Improvements 🇬🇧</div>
+            <ul class="features-list">
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">🎨</span> Colored Menu Bar Icon Option</div>
+                    <p class="feature-desc">New setting to toggle between a colored and a monochrome menu bar icon to perfectly match your desktop style and preferences.</p>
+                </li>
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">🌊</span> Interactive Water Cup Animation</div>
+                    <p class="feature-desc">A completely redesigned water cup inside the menu bar popup, featuring a dynamic fluid level animation using native SwiftUI.</p>
+                </li>
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">⏰</span> Native macOS Time Picker</div>
+                    <p class="feature-desc">Replaced manual text entry for settings time intervals with the native macOS compact DatePicker for effortless and precise scheduling.</p>
+                </li>
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">✨</span> Premium Hover Effects</div>
+                    <p class="feature-desc">Added smooth hover states and highlight transitions to all action buttons in the menu bar popover for a highly responsive, premium feel.</p>
+                </li>
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">🎉</span> Daily Goal Celebration & Badge</div>
+                    <p class="feature-desc">Celebrate hitting your daily water target with a beautiful animated congratulations card. A green checkmark badge will also appear on the menu bar icon when completed.</p>
+                </li>
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">🧹</span> Streamlined UI (Removed Snooze)</div>
+                    <p class="feature-desc">Removed the unnecessary Snooze action to simplify user choices and declutter the core menu controls.</p>
+                </li>
+                <li class="feature-card">
+                    <div class="feature-title"><span class="emoji">🌐</span> Improved Arabic Localization</div>
+                    <p class="feature-desc">Fully polished layout directions, missing words (e.g. Schedule), and isolated language bundle structures (.lproj) to allow easy language extensions by open-source contributors.</p>
+                </li>
+            </ul>
+        </div>
+
+        <div class="footer">
+            Thank you for using Maa'! Stay hydrated and healthy. / شكرًا لاستخدامك Maa'! حافظ على رطوبتك وصحتك دائماً.
+        </div>
+    </div>
+</body>
+</html>

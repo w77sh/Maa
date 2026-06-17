@@ -12,95 +12,142 @@ import UserNotifications
 struct MenuBarView: View {
     @Environment(ReminderManager.self) private var reminderManager
     @Environment(\.openSettings) private var openSettings
+    @Environment(\.openWindow) private var openWindow
     @Environment(MaaUpdaterController.self) private var updaterController
 
+    @State private var isHoveringDrink = false
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            // Status Section
-            VStack(alignment: .leading) {
-                Label(primaryStatusLine, systemImage: "cup.and.saucer.fill")
-                    .font(.headline)
-                
-                if let secondaryStatusLine {
-                    Text(secondaryStatusLine)
-                        .font(.subheadline)
-                        .foregroundStyle(.secondary)
+        VStack(spacing: 12) {
+            // Header: Progress & Info
+            HStack(alignment: .center, spacing: 16) {
+                // Animated Water Cup
+                ZStack {
+                    Image(systemName: "mug")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.secondary.opacity(0.3))
+                    
+                    Image(systemName: "mug.fill")
+                        .resizable()
+                        .scaledToFit()
+                        .foregroundColor(.blue)
+                        .mask(alignment: .bottom) {
+                            GeometryReader { geo in
+                                VStack(spacing: 0) {
+                                    Spacer(minLength: 0)
+                                    Rectangle()
+                                        .frame(height: geo.size.height * CGFloat(min(max(reminderManager.progress, 0.0), 1.0)))
+                                }
+                            }
+                        }
+                        .animation(.spring(response: 0.5, dampingFraction: 0.7), value: reminderManager.progress)
                 }
+                .frame(width: 80, height: 80)
                 
-                if let notificationStatusLine {
-                    Button(action: {
-                        reminderManager.openSystemNotificationSettings()
-                    }) {
-                        Label(notificationStatusLine, systemImage: "bell.badge.fill")
-                            .foregroundStyle(.yellow)
+                // Status Text
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(primaryStatusLine)
+                        .font(.system(size: 13, weight: .semibold))
+                        .lineLimit(1)
+                        .fixedSize(horizontal: true, vertical: false)
+                    
+                    if let secondaryStatusLine {
+                        Text(secondaryStatusLine)
+                            .font(.system(size: 10))
+                            .foregroundStyle(.secondary)
+                            .lineLimit(1)
+                            .fixedSize(horizontal: true, vertical: false)
                     }
-                    .buttonStyle(.plain)
+                    
+                    if let notificationStatusLine {
+                        Button(action: {
+                            reminderManager.openSystemNotificationSettings()
+                        }) {
+                            Label(notificationStatusLine, systemImage: "bell.badge.fill")
+                                .font(.caption)
+                                .foregroundStyle(.orange)
+                        }
+                        .buttonStyle(.plain)
+                    }
                 }
+                
+                Spacer()
             }
+            .padding(.horizontal, 16)
+            .padding(.top, 16)
 
             Divider()
 
-            // Actions Section
-            VStack(alignment: .leading, spacing: 4) {
+            // Main Actions Grid
+            HStack(spacing: 12) {
                 Button(action: {
                     reminderManager.drinkNow()
                 }) {
-                    Label("Drink now".localized(reminderManager.settings.language), systemImage: "plus.circle.fill")
+                    VStack {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title2)
+                        Text("Drink Now".localized(reminderManager.settings.language))
+                            .font(.caption)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
+                .background(isHoveringDrink ? Color.blue.opacity(0.2) : Color.blue.opacity(0.1))
+                .cornerRadius(8)
                 .disabled(reminderManager.state.isPausedToday)
-
-                Button(action: {
-                    reminderManager.snooze30Minutes()
-                }) {
-                    Label("Snooze 30 minutes".localized(reminderManager.settings.language), systemImage: "powersleep")
+                .onHover { hovering in
+                    isHoveringDrink = hovering
                 }
-                .buttonStyle(.plain)
-                .disabled(reminderManager.state.isPausedToday)
-
-                Button(action: reminderAction) {
-                    Label(reminderActionTitle.localized(reminderManager.settings.language), systemImage: reminderManager.state.isPausedToday ? "play.circle.fill" : "pause.circle.fill")
-                }
-                .buttonStyle(.plain)
             }
+            .padding(.horizontal, 16)
 
             Divider()
 
-            Button(action: {
-                WindowManager.shared.showStatistics(reminderManager: reminderManager)
-            }) {
-                Label("Statistics".localized(reminderManager.settings.language), systemImage: "chart.bar.fill")
+            // Secondary Actions
+            VStack(spacing: 4) {
+                MenuBarActionRow(
+                    icon: reminderManager.state.isPausedToday ? "play.circle.fill" : "pause.circle.fill",
+                    title: reminderActionTitle.localized(reminderManager.settings.language),
+                    action: reminderAction
+                )
+                
+                MenuBarActionRow(
+                    icon: "chart.bar.fill",
+                    title: "Statistics".localized(reminderManager.settings.language),
+                    action: { 
+                        openWindow(id: "statistics")
+                        NSApplication.shared.activate(ignoringOtherApps: true)
+                    }
+                )
             }
-            .buttonStyle(.plain)
-
-            Button(action: {
-                updaterController.checkForUpdates()
-            }) {
-                Label("Check for updates".localized(reminderManager.settings.language), systemImage: "arrow.triangle.2.circlepath")
-            }
-            .buttonStyle(.plain)
+            .padding(.horizontal, 8)
 
             Divider()
 
-            // App Management Section
-            Button(action: {
-                openSettings()
-                NSApplication.shared.activate(ignoringOtherApps: true)
-            }) {
-                Label("Settings".localized(reminderManager.settings.language), systemImage: "gearshape.fill")
+            // Footer Actions
+            VStack(spacing: 4) {
+                MenuBarActionRow(
+                    icon: "gearshape.fill",
+                    title: "Settings".localized(reminderManager.settings.language),
+                    action: {
+                        openSettings()
+                        NSApplication.shared.activate(ignoringOtherApps: true)
+                    }
+                )
+                
+                MenuBarActionRow(
+                    icon: "power.circle.fill",
+                    title: "Quit".localized(reminderManager.settings.language),
+                    action: { NSApplication.shared.terminate(nil) }
+                )
             }
-            .buttonStyle(.plain)
-
-            Divider()
-
-            Button(action: {
-                NSApplication.shared.terminate(nil)
-            }) {
-                Label("Quit".localized(reminderManager.settings.language), systemImage: "power.circle.fill")
-            }
-            .buttonStyle(.plain)
+            .padding(.horizontal, 8)
+            .padding(.bottom, 8)
         }
-        .padding(12)
+        .frame(width: 320)
     }
 
     private var primaryStatusLine: String {
@@ -147,6 +194,34 @@ struct MenuBarView: View {
             reminderManager.resumeReminders()
         } else {
             reminderManager.pauseToday()
+        }
+    }
+}
+
+struct MenuBarActionRow: View {
+    let icon: String
+    let title: String
+    let action: () -> Void
+    
+    @State private var isHovered = false
+    
+    var body: some View {
+        Button(action: action) {
+            HStack {
+                Image(systemName: icon)
+                    .frame(width: 20)
+                Text(title)
+                Spacer()
+            }
+            .padding(.vertical, 6)
+            .padding(.horizontal, 8)
+            .contentShape(Rectangle())
+            .background(isHovered ? Color.primary.opacity(0.08) : Color.clear)
+            .cornerRadius(6)
+        }
+        .buttonStyle(.plain)
+        .onHover { hovering in
+            isHovered = hovering
         }
     }
 }

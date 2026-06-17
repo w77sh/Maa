@@ -15,11 +15,17 @@ import UserNotifications
 final class ReminderManager {
     var settings: AppSettings
     var state: ReminderState
+    
+    var progress: Double {
+        let goal = settings.dailyGoalLiters * 1000
+        guard goal > 0 else { return 0 }
+        return Double(state.consumedMilliliters) / goal
+    }
     private(set) var notificationAuthorizationStatus: UNAuthorizationStatus = .notDetermined
 
     private let settingsStore: SettingsStore
     private let stateStore: ReminderStateStore
-    private let historyStore: DailyHistoryStore
+    let historyStore: DailyHistoryStore
     private let notificationManager: NotificationManager
     private var timer: Timer?
     private var wakeObserver: NSObjectProtocol?
@@ -68,6 +74,7 @@ final class ReminderManager {
         }
 
         hasStarted = true
+        observeNotificationActions()
         recalculateNextReminder(now: Date(), clearExistingSchedule: true)
         startTimer()
         observeWakeNotifications()
@@ -107,24 +114,22 @@ final class ReminderManager {
     }
 
     func drinkNow(now: Date) {
+        let oldConsumed = state.consumedMilliliters
+        let goal = Int(settings.dailyGoalLiters * 1000)
+
         state.lastProcessedDay = TimeUtils.startOfDay(for: now, calendar: calendar)
         state.lastDrinkTime = now
-        state.snoozedUntil = nil
         state.isPausedToday = false
         state.nextReminderTime = nil
         state.consumedMilliliters += settings.drinkPortionMilliliters
         saveStateAndHistory(now: now)
         recalculateNextReminder(now: now)
-    }
 
-    func snooze30Minutes() {
-        snooze30Minutes(now: Date())
-    }
-
-    func snooze30Minutes(now: Date) {
-        state.snoozedUntil = now.addingTimeInterval(30 * 60)
-        stateStore.save(state)
-        recalculateNextReminder(now: now)
+        if oldConsumed < goal && state.consumedMilliliters >= goal {
+            Task {
+                await notificationManager.sendGoalReached(language: settings.language)
+            }
+        }
     }
 
     func pauseToday() {
@@ -135,7 +140,6 @@ final class ReminderManager {
         state.lastProcessedDay = TimeUtils.startOfDay(for: now, calendar: calendar)
         state.isPausedToday = true
         state.nextReminderTime = nil
-        state.snoozedUntil = nil
         stateStore.save(state)
     }
 
@@ -147,7 +151,6 @@ final class ReminderManager {
         state.lastProcessedDay = TimeUtils.startOfDay(for: now, calendar: calendar)
         state.isPausedToday = false
         state.nextReminderTime = nil
-        state.snoozedUntil = nil
         stateStore.save(state)
         recalculateNextReminder(now: now)
     }
@@ -161,7 +164,6 @@ final class ReminderManager {
         settings = newSettings
         settingsStore.save(newSettings)
         state.nextReminderTime = nil
-        state.snoozedUntil = nil
         stateStore.save(state)
         recalculateNextReminder(now: Date(), clearExistingSchedule: true)
 
@@ -197,7 +199,7 @@ final class ReminderManager {
     }
 
     var shouldUsePausedMenuBarIcon: Bool {
-        state.isPausedToday || state.snoozedUntil != nil
+        state.isPausedToday
     }
 
     var nextReminderDescription: String? {
@@ -210,36 +212,18 @@ final class ReminderManager {
 
     private func handleTimerTick(now: Date) {
         resetDailyStateIfNeeded(now: now)
-
-        guard let nextReminderTime = state.nextReminderTime else {
+        // Timer is now only used for UI state freshness (e.g. un-pausing when snooze expires)
+        // Notifications are handled natively by macOS.
+        if let next = state.nextReminderTime, now >= next {
+            // Re-calculate the next reminder if we've passed the previous one without user interaction.
             recalculateNextReminder(now: now)
-            return
         }
-
-        guard now >= nextReminderTime else {
-            return
-        }
-
-        triggerReminder(now: now)
     }
 
     private func triggerReminder(now: Date) {
-        state.snoozedUntil = nil
-        state.nextReminderTime = ReminderScheduler.nextReminderAfterTrigger(
-            now: now,
-            settings: settings,
-            calendar: calendar
-        )
-        stateStore.save(state)
-
-        if settings.enablePopupWindow {
-            WindowManager.shared.showPopup(reminderManager: self)
-        }
-
-        guard settings.enableNotification else {
-            return
-        }
-
+        // This is only called for the "Test Notification" button now,
+        // or if we needed to trigger something manually.
+        // The actual scheduling is handled by `scheduleNotificationsIfNeeded`.
         Task {
             if notificationAuthorizationStatus != .authorized {
                 await refreshNotificationAuthorizationStatus(requestIfNeeded: true)
@@ -272,6 +256,22 @@ final class ReminderManager {
             )
         }
         stateStore.save(state)
+        
+        Task {
+            await scheduleNotificationsIfNeeded()
+        }
+    }
+
+    private func scheduleNotificationsIfNeeded() async {
+        notificationManager.cancelAllReminders()
+        
+        guard settings.enableNotification, let nextReminderTime = state.nextReminderTime else {
+            return
+        }
+        
+        if nextReminderTime > Date() {
+            await notificationManager.scheduleReminder(at: nextReminderTime, language: settings.language)
+        }
     }
 
     private func saveStateAndHistory(now: Date) {
@@ -294,7 +294,6 @@ final class ReminderManager {
         state.lastDrinkTime = nil
         state.nextReminderTime = nil
         state.isPausedToday = false
-        state.snoozedUntil = nil
         state.lastProcessedDay = currentDay
         state.consumedMilliliters = 0
         stateStore.save(state)
@@ -323,6 +322,12 @@ final class ReminderManager {
             Task { @MainActor [weak self] in
                 self?.recalculateNextReminder(now: Date())
             }
+        }
+    }
+
+    private func observeNotificationActions() {
+        NotificationCenter.default.addObserver(forName: NSNotification.Name("DrinkActionTriggered"), object: nil, queue: .main) { [weak self] _ in
+            self?.drinkNow()
         }
     }
 

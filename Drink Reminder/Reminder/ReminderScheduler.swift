@@ -43,9 +43,7 @@ enum ReminderScheduler {
             return nil
         }
 
-        if let snoozedUntil = state.snoozedUntil, snoozedUntil > now {
-            return normalizedUpcomingReminder(snoozedUntil, settings: settings, calendar: calendar)
-        }
+
 
         if !isWithinReminderWindow(now: now, settings: settings, calendar: calendar) {
             return nextStartTime(after: now, settings: settings, calendar: calendar)
