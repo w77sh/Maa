@@ -60,6 +60,8 @@ jobs:
           fi
           
           dmg_file=$(ls dist/*.dmg | head -n 1)
+          dmg_filename=$(basename "$dmg_file")
+          build_number=$(echo "$dmg_filename" | cut -d'-' -f3)
           dmg_sha256=$(shasum -a 256 "$dmg_file" | awk '{print $1}')
           
           version="${{ github.ref_name }}"
@@ -71,6 +73,7 @@ jobs:
           cask_file="Casks/maa.rb"
           sed -i '' "s/version \".*\"/version \"${version}\"/" "$cask_file"
           sed -i '' "s/sha256 \".*\"/sha256 \"${dmg_sha256}\"/" "$cask_file"
+          sed -i '' "s/Maa-#{version}-[0-9]*-macOS.dmg/Maa-#{version}-${build_number}-macOS.dmg/" "$cask_file"
           
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
