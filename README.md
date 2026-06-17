@@ -28,34 +28,11 @@
 
 ---
 
-Maa' (Arabic for *Water*) is a beautifully designed macOS menu bar utility that reminds you to drink water at intervals you define. Built entirely with **SwiftUI** and native AppKit integrations, it feels like a first-party utility built by Apple. It operates with a strict focus on system efficiency, native aesthetics, and user productivity.
-
-## 🛠 Features & Architecture
-
-### ⚡️ Zero-Polling Engine (App Nap Friendly)
-Most hydration utilities run background polling loops or heavy `Timer` loops that wake up the CPU every minute to calculate trigger times. This drains notebook batteries and prevents the OS from entering deep sleep states. 
-
-Maa' is built around a **reactive scheduling engine**:
-* When you log a drink, the app pre-calculates the exact timestamp of your next notification.
-* It registers a native local notification trigger via `UNUserNotificationCenter` and immediately goes to sleep.
-* The application consumes **0.0% CPU** in the background, fully respecting macOS **App Nap**. The OS wakes the app up only when you interact with it or receive a notification.
-
-### 🎨 Premium status Bar UI
-* **Fluid Cup Animation**: A custom SwiftUI fluid wave shader that dynamically rises and moves to visualize your real-time consumption progress.
-* **Monochrome or Color Icon**: A quick toggle in settings lets you choose between a vibrant colored status bar drop icon and a clean, system-matching monochrome icon.
-* **Status Badges**: Hitting your daily water target triggers a beautiful in-menu celebration card and applies a subtle green checkmark badge directly to the status bar icon, providing a silent, rewarding confirmation of your goal.
-* **Refined Hover States**: Premium transitions and micro-interaction states on all status bar popover buttons.
-
-### ⚙️ Native Settings & Time Picker
-* Follows Apple's Human Interface Guidelines (HIG) with tabbed settings (`General`, `Goal`, `Schedule`).
-* Integrates compact macOS native `DatePicker` controls instead of manual, error-prone text input fields.
-
-### 🌐 Easy Open-Source Localization
-* Dynamic bilingual localization support (English & Arabic) configured using decoupled `.lproj` resource folders to make it extremely easy for community developers to contribute new language packs.
+Maa' (Arabic for *Water*) is a beautifully designed macOS menu bar utility that reminds you to drink water at intervals you define. Built entirely with SwiftUI and native AppKit integrations, it feels like a first-party utility built by Apple. It operates with a strict focus on system efficiency, native aesthetics, and user productivity.
 
 ---
 
-## 📸 Screenshots
+## Screenshots
 
 To help users understand the app instantly, here are key screenshots of the user interface. 
 
@@ -82,7 +59,7 @@ To help users understand the app instantly, here are key screenshots of the user
 
 ---
 
-## 📥 Installation
+## Installation
 
 ### Method 1: Homebrew Cask (Recommended)
 You can install Maa' directly via Homebrew from the official custom tap:
@@ -108,19 +85,7 @@ Because Maa' is distributed as a self-signed binary, macOS Gatekeeper may preven
   <img src="docs/screenshots/gatekeeper-warning.png" width="380" alt="macOS Gatekeeper Warning" />
 </p>
 
-You can easily bypass this security check using one of two methods:
-
-#### Option 1: Right-Click to Open (No Terminal)
-1. Open your **Applications** folder in Finder.
-2. Locate **Maa'**.
-3. **Right-click** (or hold `Control` and click) the app icon, then choose **Open** from the context menu.
-4. A warning dialog will appear similar to the one above, but it will now include an **Open** button. Click **Open** to confirm.
-5. Once opened this way, macOS remembers the choice, and you can launch it normally in the future.
-
-*Note: If the dialog still doesn't show the Open button, open **System Settings** > **Privacy & Security**, scroll down to the Security section, and click **Open Anyway** next to the warning for Maa'.*
-
-#### Option 2: Run a Terminal Command
-If you prefer using the terminal, you can strip the macOS quarantine flag by running the following command:
+To bypass this security warning, you can strip the macOS quarantine flag by running the following command in Terminal:
 
 ```bash
 xattr -dr com.apple.quarantine /Applications/Maa\'.app
@@ -128,7 +93,7 @@ xattr -dr com.apple.quarantine /Applications/Maa\'.app
 
 ---
 
-## 💻 Local Development
+## Local Development
 
 ### Prerequisites
 * macOS 14.0 (Sonoma) or newer.
@@ -155,5 +120,5 @@ Maa' makes it straightforward to add new languages. Translations are organized i
 
 ---
 
-## 📄 License
+## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
