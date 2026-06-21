@@ -34,16 +34,12 @@ Maa' (Arabic for *Water*) is a beautifully designed macOS menu bar utility that 
 
 ## Screenshots
 
-To help users understand the app instantly, here are key screenshots of the user interface. 
-
-> [!TIP]
-> **To the Repository Owner**: Please take screenshots of your app running locally, place them in a folder (e.g. `docs/screenshots/`), and link them below replacing the placeholder blocks.
-
 #### 1. Menu Bar Popover & Wave Animation
-> **How to capture**: Open the Maa' dropdown from the status bar, log a drink to see the fluid animation inside the cup, and take a screenshot of the popup. Save as `docs/screenshots/menu-bar-popover.png`.
-```markdown
-<!-- Replace this with: ![Maa' Menu Bar View](docs/screenshots/menu-bar-popover.png) -->
-```
+> **How to capture**: Open the Maa' dropdown from the status bar, log a drink to see the fluid animation inside the cup, and take a screenshot of the popup. 
+
+<p align="center">
+  <img src="docs/screenshots/menu-bar-popover.gif" width="380" alt="macOS Gatekeeper Warning" />
+</p>
 
 #### 2. Native Tabbed Settings
 > **How to capture**: Click "Settings" in the app, click the "Schedule" or "Goal" tab to display the native macOS compact time pickers and monochrome toggle. Save as `docs/screenshots/settings-panel.png`.
