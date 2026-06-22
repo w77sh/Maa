@@ -2,3 +2,4 @@
 dist/
 *.rb
 *.dmg
+.DS_Store
