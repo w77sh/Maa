@@ -24,6 +24,34 @@ struct Drink_ReminderApp: App {
 
         Task { @MainActor in
             for await _ in NotificationCenter.default.notifications(named: NSApplication.didFinishLaunchingNotification).prefix(1) {
+                if !reminderManager.settings.hasSeenOnboarding {
+                    let window = NSWindow(
+                        contentRect: NSRect(x: 0, y: 0, width: 480, height: 640),
+                        styleMask: [.titled, .closable, .fullSizeContentView],
+                        backing: .buffered,
+                        defer: false
+                    )
+                    
+                    var onboardingView = OnboardingView()
+                    onboardingView.closeAction = {
+                        window.close()
+                    }
+                    
+                    window.titleVisibility = .hidden
+                    window.titlebarAppearsTransparent = true
+                    window.isOpaque = false
+                    window.backgroundColor = .clear
+                    window.contentView = NSHostingView(
+                        rootView: onboardingView
+                            .environment(reminderManager)
+                            .environment(\.locale, Locale(identifier: reminderManager.settings.language.rawValue))
+                            .environment(\.layoutDirection, reminderManager.settings.language == .arabic ? .rightToLeft : .leftToRight)
+                    )
+                    window.center()
+                    window.makeKeyAndOrderFront(nil)
+                    NSApplication.shared.activate(ignoringOtherApps: true)
+                }
+
                 await reminderManager.requestNotificationAuthorizationOnLaunchIfNeeded()
                 
                 if reminderManager.settings.enableNotification && reminderManager.notificationAuthorizationStatus == .denied {

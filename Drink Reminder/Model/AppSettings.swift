@@ -19,6 +19,7 @@ struct AppSettings: Codable, Equatable {
     var drinkPortionMilliliters: Int
     var language: AppLanguage
     var coloredMenuBarIcon: Bool
+    var hasSeenOnboarding: Bool
 
     static let `default` = AppSettings(
         reminderIntervalMinutes: 60,
@@ -31,7 +32,8 @@ struct AppSettings: Codable, Equatable {
         dailyGoalLiters: 2.0,
         drinkPortionMilliliters: 250,
         language: .english,
-        coloredMenuBarIcon: true
+        coloredMenuBarIcon: true,
+        hasSeenOnboarding: false
     )
 
     enum CodingKeys: String, CodingKey {
@@ -46,6 +48,7 @@ struct AppSettings: Codable, Equatable {
         case drinkPortionMilliliters
         case language
         case coloredMenuBarIcon
+        case hasSeenOnboarding
     }
 
     init(from decoder: Decoder) throws {
@@ -61,10 +64,11 @@ struct AppSettings: Codable, Equatable {
         drinkPortionMilliliters = try container.decodeIfPresent(Int.self, forKey: .drinkPortionMilliliters) ?? AppSettings.default.drinkPortionMilliliters
         language = try container.decodeIfPresent(AppLanguage.self, forKey: .language) ?? .english
         coloredMenuBarIcon = try container.decodeIfPresent(Bool.self, forKey: .coloredMenuBarIcon) ?? AppSettings.default.coloredMenuBarIcon
+        hasSeenOnboarding = try container.decodeIfPresent(Bool.self, forKey: .hasSeenOnboarding) ?? AppSettings.default.hasSeenOnboarding
     }
     
     // Add a custom initializer to be used by the default static property and tests
-    init(reminderIntervalMinutes: Int, startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, enableNotification: Bool, runAtLogin: Bool = false, dailyGoalLiters: Double = 2.0, drinkPortionMilliliters: Int = 250, language: AppLanguage = .english, coloredMenuBarIcon: Bool = true) {
+    init(reminderIntervalMinutes: Int, startHour: Int, startMinute: Int, endHour: Int, endMinute: Int, enableNotification: Bool, runAtLogin: Bool = false, dailyGoalLiters: Double = 2.0, drinkPortionMilliliters: Int = 250, language: AppLanguage = .english, coloredMenuBarIcon: Bool = true, hasSeenOnboarding: Bool = false) {
         self.reminderIntervalMinutes = reminderIntervalMinutes
         self.startHour = startHour
         self.startMinute = startMinute
@@ -76,5 +80,6 @@ struct AppSettings: Codable, Equatable {
         self.drinkPortionMilliliters = drinkPortionMilliliters
         self.language = language
         self.coloredMenuBarIcon = coloredMenuBarIcon
+        self.hasSeenOnboarding = hasSeenOnboarding
     }
 }

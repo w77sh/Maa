@@ -8,9 +8,12 @@
 import SwiftUI
 import UserNotifications
 import ServiceManagement
+import UniformTypeIdentifiers
+import Sparkle
 
 struct SettingsView: View {
     @Environment(ReminderManager.self) private var reminderManager
+    @Environment(MaaUpdaterController.self) private var updaterController
 
     @State private var intervalChoice: IntervalChoice = .minutes60
     @State private var customIntervalText = ""
@@ -41,6 +44,24 @@ struct SettingsView: View {
                     Picker("Language".localized(lang), selection: $language) {
                         ForEach(AppLanguage.allCases) { choice in
                             Text(choice.title).tag(choice)
+                        }
+                    }
+                }
+                
+                Section("Updates".localized(lang)) {
+                    Button("Check for Updates".localized(lang)) {
+                        updaterController.standardUpdaterController.checkForUpdates(nil)
+                    }
+                }
+                
+                Section("Data Management".localized(lang)) {
+                    HStack {
+                        Button("Export Data".localized(lang)) {
+                            exportData()
+                        }
+                        Spacer()
+                        Button("Import Data".localized(lang)) {
+                            importData()
                         }
                     }
                 }
@@ -251,6 +272,36 @@ struct SettingsView: View {
         } catch {
             print("Failed to \(enabled ? "register" : "unregister") login item: \(error.localizedDescription)")
             // Optionally, show an alert to the user
+        }
+    }
+    
+    private func exportData() {
+        let panel = NSSavePanel()
+        panel.allowedContentTypes = [.json]
+        panel.nameFieldStringValue = "MaaBackup.json"
+        
+        if panel.runModal() == .OK, let url = panel.url {
+            do {
+                try reminderManager.exportData(to: url)
+            } catch {
+                print("Export failed: \(error)")
+            }
+        }
+    }
+
+    private func importData() {
+        let panel = NSOpenPanel()
+        panel.allowedContentTypes = [.json]
+        panel.allowsMultipleSelection = false
+        panel.canChooseDirectories = false
+        
+        if panel.runModal() == .OK, let url = panel.url {
+            do {
+                try reminderManager.importData(from: url)
+                sync(from: reminderManager.settings)
+            } catch {
+                print("Import failed: \(error)")
+            }
         }
     }
 }

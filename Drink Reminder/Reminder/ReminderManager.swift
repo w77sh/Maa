@@ -347,4 +347,51 @@ final class ReminderManager {
         return environment["XCTestConfigurationFilePath"] == nil
             && environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1"
     }
+
+    // MARK: - Data Management (Backup / Restore)
+    
+    struct AppDataBackup: Codable {
+        let settings: AppSettings
+        let state: ReminderState?
+        let history: [DailyRecord]
+    }
+    
+    func exportData(to url: URL) throws {
+        let backup = AppDataBackup(
+            settings: settings,
+            state: state,
+            history: historyStore.load()
+        )
+        let encoder = JSONEncoder()
+        encoder.outputFormatting = .prettyPrinted
+        let data = try encoder.encode(backup)
+        try data.write(to: url)
+    }
+
+    func importData(from url: URL) throws {
+        let data = try Data(contentsOf: url)
+        let decoder = JSONDecoder()
+        let backup = try decoder.decode(AppDataBackup.self, from: data)
+        
+        // Save to respective stores
+        settingsStore.save(backup.settings)
+        if let importedState = backup.state {
+            stateStore.save(importedState)
+        }
+        historyStore.save(backup.history)
+        
+        // Update in-memory state
+        self.settings = backup.settings
+        if let importedState = backup.state {
+            self.state = importedState
+        }
+        
+        recalculateNextReminder(now: Date(), clearExistingSchedule: true)
+        
+        Task {
+            await refreshNotificationAuthorizationStatus(
+                requestIfNeeded: settings.enableNotification && allowsAuthorizationPrompts
+            )
+        }
+    }
 }
