@@ -10,6 +10,7 @@ struct OnboardingView: View {
     @Environment(ReminderManager.self) private var reminderManager
     @Environment(\.dismiss) private var dismiss
     
+    @State private var currentPage = 0
     @State private var dailyGoalLiters: Double = 2.0
     @State private var intervalChoice: IntervalChoice = .minutes60
     @State private var customIntervalText = "60"
@@ -17,8 +18,6 @@ struct OnboardingView: View {
     @State private var endTime = Calendar.current.date(from: DateComponents(hour: 20, minute: 0)) ?? Date()
     @State private var enableNotification = true
     @State private var language: AppLanguage = .english
-    
-    var closeAction: (() -> Void)? = nil
     
     var body: some View {
         let lang = language
@@ -35,11 +34,11 @@ struct OnboardingView: View {
                     )
                     .shadow(color: .blue.opacity(0.3), radius: 10, x: 0, y: 5)
                 
-                Text("Welcome to Maa".localized(lang))
+                Text(headerTitle(for: lang))
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundStyle(.primary)
                 
-                Text("Let's set up your daily hydration goal.".localized(lang))
+                Text(headerSubtitle(for: lang))
                     .font(.system(size: 16, weight: .regular))
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
@@ -48,70 +47,54 @@ struct OnboardingView: View {
             .padding(.bottom, 30)
             
             // Content
-            ScrollView {
-                VStack(spacing: 24) {
-                    // Goal Section
-                    OnboardingSection(title: "Daily Goal".localized(lang), icon: "target") {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Text(String(format: "Daily Goal: %.1f liters".localized(lang), dailyGoalLiters))
-                                .font(.headline)
-                            Slider(value: $dailyGoalLiters, in: 0.5...10, step: 0.1)
-                                .tint(.cyan)
-                        }
-                    }
-                    
-                    // Time Range Section
-                    OnboardingSection(title: "Active Hours".localized(lang), icon: "clock") {
-                        HStack(spacing: 20) {
-                            DatePicker("Start Time".localized(lang), selection: $startTime, displayedComponents: .hourAndMinute)
-                                .datePickerStyle(.compact)
-                                .labelsHidden()
-                            
-                            Text("to".localized(lang))
-                                .foregroundStyle(.secondary)
-                            
-                            DatePicker("End Time".localized(lang), selection: $endTime, displayedComponents: .hourAndMinute)
-                                .datePickerStyle(.compact)
-                                .labelsHidden()
-                        }
-                    }
-                    
-                    // Interval Section
-                    OnboardingSection(title: "Reminder Frequency".localized(lang), icon: "bell.badge") {
-                        VStack(alignment: .leading, spacing: 12) {
-                            Picker("", selection: $intervalChoice) {
-                                ForEach(IntervalChoice.allCases) { choice in
-                                    Text(choice.title(for: lang)).tag(choice)
-                                }
-                            }
-                            .pickerStyle(.menu)
-                            .labelsHidden()
-                            
-                            if intervalChoice == .custom {
-                                Stepper(value: Binding(
-                                    get: { Int(customIntervalText) ?? 60 },
-                                    set: { customIntervalText = String($0) }
-                                ), in: 1...1440, step: 5) {
-                                    Text(String(format: "%d minutes".localized(lang), Int(customIntervalText) ?? 60))
-                                }
-                            }
-                        }
-                    }
-                    
-                    // Notification Section
-                    OnboardingSection(title: "Notifications".localized(lang), icon: "message") {
-                        Toggle("Enable Notifications".localized(lang), isOn: $enableNotification)
-                            .toggleStyle(.switch)
-                            .tint(.cyan)
-                    }
+            ZStack {
+                switch currentPage {
+                case 0:
+                    goalPage(lang: lang)
+                        .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
+                case 1:
+                    schedulePage(lang: lang)
+                        .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
+                case 2:
+                    notificationPage(lang: lang)
+                        .transition(.asymmetric(insertion: .move(edge: .trailing), removal: .move(edge: .leading)))
+                default:
+                    EmptyView()
                 }
-                .padding(.horizontal, 40)
             }
+            .animation(.easeInOut, value: currentPage)
+            .padding(.horizontal, 40)
             
-            // Footer
-            VStack {
-                Button(action: finishOnboarding) {
-                    Text("Get Started".localized(lang))
+            Spacer(minLength: 0)
+            
+            // Footer Navigation
+            HStack(spacing: 20) {
+                if currentPage > 0 {
+                    Button(action: {
+                        withAnimation { currentPage -= 1 }
+                    }) {
+                        Text("Back".localized(lang))
+                            .font(.system(size: 16, weight: .semibold))
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 12)
+                            .background(Color.clear)
+                            .overlay(
+                                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                                    .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+                            )
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                }
+                
+                Button(action: {
+                    if currentPage < 2 {
+                        withAnimation { currentPage += 1 }
+                    } else {
+                        finishOnboarding()
+                    }
+                }) {
+                    Text(currentPage < 2 ? "Next".localized(lang) : "Get Started".localized(lang))
                         .font(.system(size: 16, weight: .semibold))
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 12)
@@ -121,12 +104,13 @@ struct OnboardingView: View {
                         .foregroundStyle(.white)
                         .clipShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
                         .shadow(color: .blue.opacity(0.3), radius: 8, x: 0, y: 4)
+                        .contentShape(Rectangle())
                 }
                 .buttonStyle(.plain)
             }
             .padding(40)
         }
-        .frame(width: 480, height: 640)
+        .frame(width: 480, height: 500)
         .background(
             ZStack {
                 Color.clear
@@ -138,6 +122,105 @@ struct OnboardingView: View {
             self.language = reminderManager.settings.language
             self.dailyGoalLiters = reminderManager.settings.dailyGoalLiters
             self.enableNotification = reminderManager.settings.enableNotification
+        }
+    }
+    
+    private func headerTitle(for lang: AppLanguage) -> String {
+        switch currentPage {
+        case 0: return "Welcome to Maa".localized(lang)
+        case 1: return "Your Schedule".localized(lang)
+        case 2: return "Stay Updated".localized(lang)
+        default: return ""
+        }
+    }
+    
+    private func headerSubtitle(for lang: AppLanguage) -> String {
+        switch currentPage {
+        case 0: return "Let's set up your daily hydration goal.".localized(lang)
+        case 1: return "When should we remind you to drink water?".localized(lang)
+        case 2: return "Allow notifications so we can remind you.".localized(lang)
+        default: return ""
+        }
+    }
+    
+    @ViewBuilder
+    private func goalPage(lang: AppLanguage) -> some View {
+        OnboardingSection(title: "Daily Goal".localized(lang), icon: "target") {
+            VStack(alignment: .leading, spacing: 12) {
+                Text(String(format: "Daily Goal: %.1f liters".localized(lang), dailyGoalLiters))
+                    .font(.headline)
+                Slider(value: $dailyGoalLiters, in: 0.5...10, step: 0.1)
+                    .tint(.cyan)
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func schedulePage(lang: AppLanguage) -> some View {
+        VStack(spacing: 24) {
+            OnboardingSection(title: "Active Hours".localized(lang), icon: "clock") {
+                HStack(spacing: 20) {
+                    DatePicker("Start Time".localized(lang), selection: $startTime, displayedComponents: .hourAndMinute)
+                        .datePickerStyle(.stepperField)
+                        .labelsHidden()
+                        .colorMultiply(.white.opacity(0.8)) // Dim the solid background
+                    
+                    Text("to".localized(lang))
+                        .foregroundStyle(.secondary)
+                    
+                    DatePicker("End Time".localized(lang), selection: $endTime, displayedComponents: .hourAndMinute)
+                        .datePickerStyle(.stepperField)
+                        .labelsHidden()
+                        .colorMultiply(.white.opacity(0.8)) // Dim the solid background
+                }
+            }
+            
+            OnboardingSection(title: "Reminder Frequency".localized(lang), icon: "bell.badge") {
+                VStack(alignment: .leading, spacing: 12) {
+                    Menu {
+                        ForEach(IntervalChoice.allCases) { choice in
+                            Button(choice.title(for: lang)) {
+                                intervalChoice = choice
+                            }
+                        }
+                    } label: {
+                        HStack {
+                            Text(intervalChoice.title(for: lang))
+                                .foregroundStyle(.primary)
+                            Spacer()
+                            Image(systemName: "chevron.up.chevron.down")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        .padding(.horizontal, 12)
+                        .padding(.vertical, 8)
+                        .background(Color.clear)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 6, style: .continuous)
+                                .stroke(Color.primary.opacity(0.2), lineWidth: 1)
+                        )
+                    }
+                    .buttonStyle(.plain)
+                    
+                    if intervalChoice == .custom {
+                        Stepper(value: Binding(
+                            get: { Int(customIntervalText) ?? 60 },
+                            set: { customIntervalText = String($0) }
+                        ), in: 1...1440, step: 5) {
+                            Text(String(format: "%d minutes".localized(lang), Int(customIntervalText) ?? 60))
+                        }
+                    }
+                }
+            }
+        }
+    }
+    
+    @ViewBuilder
+    private func notificationPage(lang: AppLanguage) -> some View {
+        OnboardingSection(title: "Notifications".localized(lang), icon: "message") {
+            Toggle("Enable Notifications".localized(lang), isOn: $enableNotification)
+                .toggleStyle(.switch)
+                .tint(.cyan)
         }
     }
     
@@ -169,7 +252,7 @@ struct OnboardingView: View {
             }
         }
         
-        closeAction?()
+        NotificationCenter.default.post(name: Notification.Name("OnboardingFinished"), object: nil)
         dismiss()
     }
 }
@@ -198,13 +281,10 @@ struct OnboardingSection<Content: View>: View {
             
             content
                 .padding()
-                .background(
-                    RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .fill(Color(nsColor: .windowBackgroundColor).opacity(0.4))
-                )
+                .background(Color.clear) // Completely transparent
                 .overlay(
                     RoundedRectangle(cornerRadius: 12, style: .continuous)
-                        .stroke(Color.white.opacity(0.2), lineWidth: 1)
+                        .stroke(Color.primary.opacity(0.1), lineWidth: 1) // Very subtle border
                 )
         }
     }

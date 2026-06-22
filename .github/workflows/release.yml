@@ -15,6 +15,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Install dependencies
         run: brew install create-dmg
@@ -35,7 +37,19 @@ jobs:
           mkdir -p Sparkle-Bin appcast_work
           curl -sL https://github.com/sparkle-project/Sparkle/releases/download/2.6.4/Sparkle-2.6.4.tar.xz | tar -xJ -C Sparkle-Bin
           cp dist/*.dmg appcast_work/
-          cp dist/*.html appcast_work/ 2>/dev/null || true
+          
+          dmg_file=$(ls appcast_work/*.dmg | head -n 1)
+          dmg_basename=$(basename "$dmg_file" .dmg)
+          
+          echo "<h3>What's New in ${{ github.ref_name }}</h3><ul>" > "appcast_work/${dmg_basename}.html"
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            git log ${PREV_TAG}..HEAD --pretty=format:"<li>%s</li>" >> "appcast_work/${dmg_basename}.html"
+          else
+            git log -n 5 --pretty=format:"<li>%s</li>" >> "appcast_work/${dmg_basename}.html"
+          fi
+          echo "</ul>" >> "appcast_work/${dmg_basename}.html"
+          
           echo "$SPARKLE_EDDSA_PRIVATE_KEY" | ./Sparkle-Bin/bin/generate_appcast --download-url-prefix "https://github.com/w77sh/Maa/releases/download/${{ github.ref_name }}/" --ed-key-file - appcast_work/
           cp appcast_work/appcast.xml dist/
 

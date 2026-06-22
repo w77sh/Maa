@@ -2,6 +2,7 @@ import AppKit
 import SwiftUI
 import Sparkle
 import UserNotifications
+import Combine
 
 @main
 struct Drink_ReminderApp: App {
@@ -26,16 +27,25 @@ struct Drink_ReminderApp: App {
             for await _ in NotificationCenter.default.notifications(named: NSApplication.didFinishLaunchingNotification).prefix(1) {
                 if !reminderManager.settings.hasSeenOnboarding {
                     let window = NSWindow(
-                        contentRect: NSRect(x: 0, y: 0, width: 480, height: 640),
+                        contentRect: NSRect(x: 0, y: 0, width: 480, height: 500),
                         styleMask: [.titled, .closable, .fullSizeContentView],
                         backing: .buffered,
                         defer: false
                     )
                     
-                    var onboardingView = OnboardingView()
-                    onboardingView.closeAction = {
-                        window.close()
+                    Task { @MainActor in
+                        for await _ in NotificationCenter.default.notifications(named: Notification.Name("OnboardingFinished")).prefix(1) {
+                            window.close()
+                            
+                            let alert = NSAlert()
+                            alert.messageText = "Setup Complete!".localized(reminderManager.settings.language)
+                            alert.informativeText = "Maa is now running in your Menu Bar at the top of the screen. Look for the water drop icon!".localized(reminderManager.settings.language)
+                            alert.addButton(withTitle: "OK".localized(reminderManager.settings.language))
+                            alert.runModal()
+                        }
                     }
+                    
+                    var onboardingView = OnboardingView()
                     
                     window.titleVisibility = .hidden
                     window.titlebarAppearsTransparent = true
