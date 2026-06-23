@@ -17,7 +17,7 @@ struct MenuBarView: View {
 
     @State private var isHoveringDrink = false
     @State private var isHoveringUndo = false
-    @State private var isAnimatingWave = false
+    @State private var isMenuVisible = false
 
     var body: some View {
         VStack(spacing: 12) {
@@ -40,12 +40,12 @@ struct MenuBarView: View {
                                     Spacer(minLength: 0)
                                     let progress = min(max(reminderManager.progress, 0.0), 1.0)
                                     if progress > 0 && progress < 1.0 {
-                                        Wave(phase: Angle.degrees(isAnimatingWave ? 360.0 : 0.0))
-                                            .frame(height: geo.size.height * CGFloat(progress))
-                                            .animation(.linear(duration: 2.0).repeatForever(autoreverses: false), value: isAnimatingWave)
-                                            .onAppear {
-                                                isAnimatingWave = true
-                                            }
+                                        TimelineView(.animation(minimumInterval: 1.0/30.0, paused: !isMenuVisible)) { context in
+                                            let time = context.date.timeIntervalSinceReferenceDate
+                                            let phase = Angle.degrees(time * 180)
+                                            Wave(phase: phase)
+                                                .frame(height: geo.size.height * CGFloat(progress))
+                                        }
                                     } else {
                                         Rectangle()
                                             .frame(height: geo.size.height * CGFloat(progress))
@@ -56,6 +56,12 @@ struct MenuBarView: View {
                         .animation(.spring(response: 0.5, dampingFraction: 0.7), value: reminderManager.progress)
                 }
                 .frame(width: 80, height: 80)
+                .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { _ in
+                    isMenuVisible = true
+                }
+                .onReceive(NotificationCenter.default.publisher(for: NSWindow.didResignKeyNotification)) { _ in
+                    isMenuVisible = false
+                }
                 
                 // Status Text
                 VStack(alignment: .leading, spacing: 2) {
