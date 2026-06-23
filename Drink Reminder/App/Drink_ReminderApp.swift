@@ -115,23 +115,23 @@ struct Drink_ReminderApp: App {
     }
 
     private var menuBarIcon: Image {
-        if let image = templatedMenuBarIcon {
+        let consumed = reminderManager.state.consumedMilliliters
+        let goal = Int(reminderManager.settings.dailyGoalLiters * 1000)
+        let progress = goal > 0 ? min(Double(consumed) / Double(goal), 1.0) : 0.0
+
+        if let image = templatedMenuBarIcon(progress: progress) {
             return Image(nsImage: image)
         } else {
             return Image(systemName: "mug")
         }
     }
 
-    private var templatedMenuBarIcon: NSImage? {
+    private func templatedMenuBarIcon(progress: Double) -> NSImage? {
         if reminderManager.shouldUsePausedMenuBarIcon {
             guard let image = NSImage(named: Self.menuBarPausedIconAssetName)?.copy() as? NSImage else { return nil }
             image.isTemplate = true
             return image
         }
-
-        let consumed = reminderManager.state.consumedMilliliters
-        let goal = Int(reminderManager.settings.dailyGoalLiters * 1000)
-        let progress = goal > 0 ? min(Double(consumed) / Double(goal), 1.0) : 0.0
 
         let size = NSSize(width: 18, height: 18)
         let image = NSImage(size: size, flipped: false) { rect in
@@ -155,13 +155,20 @@ struct Drink_ReminderApp: App {
             tintedOutline.draw(in: drawRect)
 
             if progress <= 0 {
-                let redLine = NSBezierPath()
-                redLine.move(to: NSPoint(x: drawRect.minX + 3, y: drawRect.minY + 2))
-                redLine.line(to: NSPoint(x: drawRect.maxX - 3, y: drawRect.minY + 2))
-                NSColor.systemRed.setStroke()
-                redLine.lineWidth = 1.5
-                redLine.lineCapStyle = .round
-                redLine.stroke()
+                NSGraphicsContext.current?.saveGraphicsState()
+                
+                let fillHeight = drawRect.height * 0.15
+                let clipRect = NSRect(x: 0, y: 0, width: 18, height: drawRect.minY + fillHeight)
+                NSBezierPath(rect: clipRect).addClip()
+                
+                let tintedFill = fill.copy() as! NSImage
+                tintedFill.lockFocus()
+                NSColor.systemRed.set()
+                NSRect(origin: .zero, size: tintedFill.size).fill(using: .sourceAtop)
+                tintedFill.unlockFocus()
+                
+                tintedFill.draw(in: drawRect)
+                NSGraphicsContext.current?.restoreGraphicsState()
             } else {
                 NSGraphicsContext.current?.saveGraphicsState()
                 
