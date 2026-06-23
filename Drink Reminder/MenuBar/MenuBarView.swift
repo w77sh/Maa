@@ -16,6 +16,8 @@ struct MenuBarView: View {
     @Environment(MaaUpdaterController.self) private var updaterController
 
     @State private var isHoveringDrink = false
+    @State private var isHoveringUndo = false
+    @State private var isMenuVisible = false
 
     var body: some View {
         VStack(spacing: 12) {
@@ -26,7 +28,7 @@ struct MenuBarView: View {
                     Image(systemName: "mug")
                         .resizable()
                         .scaledToFit()
-                        .foregroundColor(.secondary.opacity(0.3))
+                        .foregroundColor(reminderManager.progress == 0 ? .red : .secondary.opacity(0.3))
                     
                     Image(systemName: "mug.fill")
                         .resizable()
@@ -36,14 +38,30 @@ struct MenuBarView: View {
                             GeometryReader { geo in
                                 VStack(spacing: 0) {
                                     Spacer(minLength: 0)
-                                    Rectangle()
-                                        .frame(height: geo.size.height * CGFloat(min(max(reminderManager.progress, 0.0), 1.0)))
+                                    let progress = min(max(reminderManager.progress, 0.0), 1.0)
+                                    if progress > 0 && progress < 1.0 {
+                                        TimelineView(.animation(minimumInterval: 1.0/30.0, paused: !isMenuVisible)) { context in
+                                            let time = context.date.timeIntervalSinceReferenceDate
+                                            let phase = Angle.degrees(time * 180)
+                                            Wave(phase: phase)
+                                                .frame(height: geo.size.height * CGFloat(progress))
+                                        }
+                                    } else {
+                                        Rectangle()
+                                            .frame(height: geo.size.height * CGFloat(progress))
+                                    }
                                 }
                             }
                         }
                         .animation(.spring(response: 0.5, dampingFraction: 0.7), value: reminderManager.progress)
                 }
                 .frame(width: 80, height: 80)
+                .onReceive(NotificationCenter.default.publisher(for: NSWindow.didBecomeKeyNotification)) { _ in
+                    isMenuVisible = true
+                }
+                .onReceive(NotificationCenter.default.publisher(for: NSWindow.didResignKeyNotification)) { _ in
+                    isMenuVisible = false
+                }
                 
                 // Status Text
                 VStack(alignment: .leading, spacing: 2) {
@@ -81,6 +99,27 @@ struct MenuBarView: View {
 
             // Main Actions Grid
             HStack(spacing: 12) {
+                Button(action: {
+                    reminderManager.undoDrink()
+                }) {
+                    VStack {
+                        Image(systemName: "minus.circle.fill")
+                            .font(.title2)
+                        Text("Undo".localized(reminderManager.settings.language))
+                            .font(.caption)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                    .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .background(isHoveringUndo ? Color.red.opacity(0.2) : Color.red.opacity(0.1))
+                .cornerRadius(8)
+                .disabled(reminderManager.state.consumedMilliliters == 0 || reminderManager.state.isPausedToday)
+                .onHover { hovering in
+                    isHoveringUndo = hovering
+                }
+                
                 Button(action: {
                     reminderManager.drinkNow()
                 }) {
@@ -223,6 +262,41 @@ struct MenuBarActionRow: View {
         .onHover { hovering in
             isHovered = hovering
         }
+    }
+}
+
+struct Wave: Shape {
+    var phase: Angle
+
+    var animatableData: Double {
+        get { phase.radians }
+        set { phase = Angle(radians: newValue) }
+    }
+
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        let width = rect.width
+        let height = rect.height
+        
+        path.move(to: CGPoint(x: 0, y: height))
+        
+        for x in stride(from: 0, through: width, by: 2) {
+            let relativeX = x / width
+            // Combine multiple sine waves for a more realistic, organic effect
+            let wave1 = sin(relativeX * .pi * 4 + phase.radians)
+            let wave2 = sin(relativeX * .pi * 5.5 + phase.radians * 1.3) * 0.6
+            let wave3 = sin(relativeX * .pi * 2.5 - phase.radians * 0.7) * 0.4
+            
+            let combinedSine = (wave1 + wave2 + wave3) / 2.0
+            
+            let y = 3 + combinedSine * 3 // Base y is 3, max amplitude variation
+            path.addLine(to: CGPoint(x: x, y: y))
+        }
+        
+        path.addLine(to: CGPoint(x: width, y: height))
+        path.addLine(to: CGPoint(x: 0, y: height))
+        path.closeSubpath()
+        return path
     }
 }
 

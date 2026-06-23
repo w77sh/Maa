@@ -132,6 +132,23 @@ final class ReminderManager {
         }
     }
 
+    func undoDrink() {
+        undoDrink(now: Date())
+    }
+
+    func undoDrink(now: Date) {
+        let amount = settings.drinkPortionMilliliters
+        if state.consumedMilliliters >= amount {
+            state.consumedMilliliters -= amount
+        } else {
+            state.consumedMilliliters = 0
+        }
+        
+        state.lastProcessedDay = TimeUtils.startOfDay(for: now, calendar: calendar)
+        saveStateAndHistory(now: now)
+        recalculateNextReminder(now: now)
+    }
+
     func pauseToday() {
         pauseToday(now: Date())
     }
