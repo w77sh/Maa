@@ -1,5 +1,6 @@
 .build/
 dist/
+scripts/
 *.rb
 *.dmg
 .DS_Store
